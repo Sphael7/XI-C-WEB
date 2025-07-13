@@ -344,11 +344,16 @@ body.light-mode .bottom-bar span {
     transition: color 0.3s ease;
 }
 
-.back-button i,
-.settings-button i {
-    margin: 0 5px;
+.back-button i {
+    margin: 0 5px; /* Tetap pertahankan margin untuk ikon back */
     font-size: 1.2em;
 }
+
+.settings-button i {
+    margin: 0; /* Hapus margin agar ikon berada di tengah jika tidak ada teks */
+    font-size: 1.2em;
+}
+
 
 body.dark-mode .current-date {
     font-size: 1.1em;
