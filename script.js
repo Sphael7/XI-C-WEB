@@ -4,25 +4,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const modeIcon = modeToggle.querySelector('.mode-icon');
     const currentDateElement = document.getElementById('current-date');
 
-    // Global Header elements
     const globalTopBar = document.getElementById('global-top-bar');
     const headerSearchSection = globalTopBar.querySelector('.search-section');
     const headerSearchInput = globalTopBar.querySelector('.search-input');
     const headerModeToggle = globalTopBar.querySelector('.mode-toggle');
 
-    // Views
     const mainView = document.getElementById('main-view');
     const jadwalView = document.getElementById('jadwal-view');
     const settingsView = document.getElementById('settings-view');
     const profileView = document.getElementById('profile-view');
     const loginView = document.getElementById('login-view');
+    const otherView = document.getElementById('other-view');
+    const teacherView = document.getElementById('teacher-view');
 
-    // Main Page elements
     const jadwalBox = document.getElementById('jadwal-box');
+    const othersBox = document.getElementById('others-box');
+    const teacherBox = document.getElementById('teacher-box');
     const settingsButtonFooter = document.getElementById('settings-button-footer-main');
-    const globalHomeButtonFooter = document.getElementById('global-home-button-footer'); // Home button reference
+    const globalHomeButtonFooter = document.getElementById('global-home-button-footer');
 
-    // Jadwal View elements
     const dayDisplayBubble = document.getElementById('day-display-bubble');
     const currentDayDisplay = document.getElementById('current-day-display');
     const dropdownArrow = document.querySelector('.dropdown-arrow');
@@ -33,10 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
     let currentDayIndex = 0;
 
-    // Settings View elements
     const profileSettingsItem = document.getElementById('profile-settings-item');
 
-    // Profile View elements
     const profilePhoto = document.getElementById('profile-photo');
     const profilePhotoUpload = document.getElementById('profile-photo-upload');
     const uploadPhotoIcon = document.getElementById('upload-photo-icon');
@@ -47,8 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileNIS = document.getElementById('profile-nis');
     const profileLoginButton = document.getElementById('profile-login-button');
 
-    // Login View elements
-    const loginBackButton = document.getElementById('login-back-button'); // The ONLY back button left
+    const loginBackButton = document.getElementById('login-back-button');
     const loginForm = document.getElementById('login-form');
     const inputNama = document.getElementById('input-nama');
     const inputKelas = document.getElementById('input-kelas');
@@ -56,7 +53,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputNISN = document.getElementById('input-nisn');
     const inputNIS = document.getElementById('input-nis');
 
-    // --- State and Data Management ---
+    const realTimeWIB = document.getElementById('real-time-wib');
+
+    const subjectGridContainer = teacherView.querySelector('.subject-grid-container');
+    const prevSubjectPageArrow = document.getElementById('prev-subject-page');
+    const nextSubjectPageArrow = document.getElementById('next-subject-page');
+    const currentPageDisplay = document.getElementById('current-page-display');
+    const totalPagesDisplay = document.getElementById('total-pages-display');
+
+    const teacherDetailModalOverlay = document.getElementById('teacher-detail-modal-overlay');
+    const modalSubjectTitle = document.getElementById('modal-subject-title');
+    const modalTeacherTableBody = document.getElementById('modal-teacher-table-body');
+    const closeTeacherModalButton = document.getElementById('close-teacher-modal');
+
     let currentUserProfile = {
         nama: "Belum diisi",
         kelas: "Belum diisi",
@@ -66,8 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         photo: "https://via.placeholder.com/100"
     };
 
-    // --- Navigation State (simplified as history is not tracked for Home button) ---
-    let currentActiveView = null; // To track the currently displayed view element
+    let currentActiveView = null;
 
     const jadwalData = {
         "Senin": [
@@ -103,7 +111,127 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
-    // --- Theme Toggle Logic ---
+    // Raw Teacher Data
+    const rawTeacherData = [
+        { kode: "A1", nama: "MUSLICHA, M.Pd.", mapel: "PPKN" },
+        { kode: "A2", nama: "BIBIT PURWANTINI, M.Pd.", mapel: "PPKN" },
+        { kode: "B0", nama: "Drs. UBAIDILLAH, M.Pd. PEND. AGAMA ISLAM", mapel: "PEND. AGAMA" },
+        { kode: "B1", nama: "RUMADA, S.PAK., M.Pd. PEND. AGAMA KRISTEN", mapel: "PEND. AGAMA" },
+        { kode: "B2", nama: "HENNY BIBINUR BANIAH, M.Pd.", mapel: "PEND. AGAMA" },
+        { kode: "B3", nama: "SAIFUDIN, S.SI, M.Pd.", mapel: "PEND. AGAMA" },
+        { kode: "B4", nama: "ABDUL SALIM, M.Pd.", mapel: "PEND. AGAMA" },
+        { kode: "B5", nama: "OKTAVIANUS, S.S. PEND. AGAMA KATOLIK", mapel: "PEND. AGAMA" },
+        { kode: "C1", nama: "H. EDY PRAMONO, S.Pd.", mapel: "BAHASA INDONESIA" },
+        { kode: "C2", nama: "NURSITI KAMSIATI, S.Pd.", mapel: "BAHASA INDONESIA" },
+        { kode: "C3", nama: "ROULINA PURBA, S.Pd", mapel: "BAHASA INDONESIA" },
+        { kode: "C4", nama: "NIKEN MEILINA PUTRI, S.Pd.", mapel: "BAHASA INDONESIA" },
+        { kode: "D1", nama: "USWATUN HASANAH, S.Pd.", mapel: "SEJARAH" },
+        { kode: "D2", nama: "ARI SULASTRI, S.Pd.", mapel: "SEJARAH" },
+        { kode: "E1", nama: "Drs. EKO RAHARDJO, M.M.", mapel: "BAHASA INGGRIS" },
+        { kode: "E2", nama: "MUHAMMAD FAJAR, S.Pd.", mapel: "BAHASA INGGRIS" },
+        { kode: "E3", nama: "AULIA BELFA MUTHIA, S.Pd.", mapel: "BAHASA INGGRIS" },
+        { kode: "F1", nama: "Dr. GATOT HANDOKO, M.Pd.", mapel: "PJOK" },
+        { kode: "F2", nama: "BAGUS CIPTA ASMAULI, S.Pd.", mapel: "PJOK" },
+        { kode: "F3", nama: "BAMBANG TRIAJI ASNOTO, M.Pd.", mapel: "PJOK" },
+        { kode: "G1", nama: "SWISMA, S.Pd.", mapel: "MATEMATIKA" },
+        { kode: "G2", nama: "HARI WAHYONO, S.Pd.", mapel: "MATEMATIKA" },
+        { kode: "G3", nama: "FRONIKA MUNTHE, S.Pd.", mapel: "MATEMATIKA" },
+        { kode: "G4", nama: "ANGGRAINI PRATIWI, S.Pd.", mapel: "MATEMATIKA" },
+        { kode: "G5", nama: "AHMAD SYAUQI, S.Si, M.Pd.", mapel: "MATEMATIKA" },
+        { kode: "G6", nama: "WAWAN SETIAWAN, S.Si, M.Stat.", mapel: "MATEMATIKA" },
+        { kode: "G7", nama: "SUCI FITRIA, S.Pd.", mapel: "MATEMATIKA" },
+        { kode: "H1", nama: "Drs. H. YANI BAYANI, M,Pd.", mapel: "FISIKA" },
+        { kode: "H2", nama: "JOKO UNTORO, S.Pd.", mapel: "FISIKA" },
+        { kode: "H3", nama: "FAKHRIZAL ARSI, S.Pd.", mapel: "FISIKA" },
+        { kode: "H4", nama: "HIDAYATUN NIKMAH, S.Pd.", mapel: "FISIKA" },
+        { kode: "I1", nama: "YUSTRIDA MAISA, S.Pd, M.Si.", mapel: "BIOLOGI" },
+        { kode: "I2", nama: "ETI SUGIARTI, S.Pd.", mapel: "BIOLOGI" },
+        { kode: "I3", nama: "DIVA RARA VIDYANI MAISA, S.Pd.", mapel: "BIOLOGI" },
+        { kode: "J1", nama: "HJ. RINA GUSTINI, M.Pd.", mapel: "KIMIA" },
+        { kode: "J2", nama: "DWI AMELIA SAVITRI, M.Pd.", mapel: "KIMIA" },
+        { kode: "J3", nama: "JERY ANDERSON SITORUS, S.Pd", mapel: "KIMIA" },
+        { kode: "J4", nama: "ROSSY LANASARI, S.Pd.", mapel: "KIMIA" },
+        { kode: "K1", nama: "EVAWATI, S.Pd.", mapel: "EKONOMI" },
+        { kode: "K2", nama: "NUH HUDAWI, S.Pd.", mapel: "EKONOMI" },
+        { kode: "K3", nama: "FAUZIYAH FITRIYANI, M.Pd.", mapel: "EKONOMI" },
+        { kode: "L1", nama: "HARYONO, S.Pd.", mapel: "SOSIOLOGI" },
+        { kode: "L2", nama: "ERZA HERMAWAN, S.Pd.", mapel: "SOSIOLOGI" },
+        { kode: "N1", nama: "WANGSA JAYA, M.Si.", mapel: "GEOGRAFI" },
+        { kode: "N2", nama: "ERZA HERMAWAN, S.Pd.", mapel: "GEOGRAFI" },
+        { kode: "O1", nama: "AHMAD JATI, M.Pd.", mapel: "SENI BUDAYA" },
+        { kode: "O2", nama: "REZA FAJRIN WIJAYA KUSUMA, S.Pd.", mapel: "SENI BUDAYA" },
+        { kode: "Q1", nama: "IKA BUDIANINGSIH, S.Pd.", mapel: "BIMBINGAN KONSELING" },
+        { kode: "Q2", nama: "CATUR RAHMI SETIAWATI, S.Pd.", mapel: "BIMBINGAN KONSELING" },
+        { kode: "Q3", nama: "DINA APRILIYATI, S.Pd.", mapel: "BIMBINGAN KONSELING" },
+        { kode: "Q4", nama: "MUHAMMAD SUTRISNO, S.Pd.", mapel: "BIMBINGAN KONSELING" },
+        { kode: "S1", nama: "ROCMULJATI EKASARI DAWAM, S.Pd.", mapel: "BAHASA JERMAN" },
+        { kode: "S2", nama: "SRI REJEKI, S.Pd.", mapel: "BAHASA JERMAN" },
+        { kode: "S3", nama: "WURHANDAYANI, S.Pd.", mapel: "BAHASA JERMAN" },
+        { kode: "T1", nama: "KHAIRUNISSA, S.T.", mapel: "INFORMATIKA" },
+        { kode: "T2", nama: "HAERUDI YANSHAH, S.Kom, M.Pd.", mapel: "INFORMATIKA" },
+        { kode: "T3", nama: "PRASOJO, M.M.S.I.", mapel: "INFORMATIKA" },
+        { kode: "PK1", nama: "EVAWATI, S.Pd.", mapel: "PKWU" },
+        { kode: "PK2", nama: "NUH HUDAWI, S.Pd.", mapel: "PKWU" },
+        { kode: "PK3", nama: "DWI AMELIA SAVITRI, M.Pd.", mapel: "PKWU" },
+        { kode: "PK4", nama: "HIDAYATUN NIKMAH, S.Pd.", mapel: "PKWU" },
+        { kode: "PK5", nama: "ROSSY LANASARI, S.Pd", mapel: "PKWU" }
+    ];
+
+    const groupedTeacherData = rawTeacherData.reduce((acc, teacher) => {
+        if (!acc[teacher.mapel]) {
+            acc[teacher.mapel] = [];
+        }
+        acc[teacher.mapel].push(teacher);
+        return acc;
+    }, {});
+
+    const subjectNames = Object.keys(groupedTeacherData);
+    const itemsPerPage = 6;
+    let currentTeacherPage = 0;
+    const totalPages = Math.ceil(subjectNames.length / itemsPerPage);
+
+
+    function populateTeacherTable(subject) {
+        modalTeacherTableBody.innerHTML = '';
+        const teachersForSubject = groupedTeacherData[subject];
+        if (teachersForSubject && teachersForSubject.length > 0) {
+            teachersForSubject.forEach(teacher => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${teacher.kode}</td>
+                    <td>${teacher.nama}</td>
+                    <td>${teacher.mapel}</td>
+                `;
+                modalTeacherTableBody.appendChild(row);
+            });
+        } else {
+            modalTeacherTableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; opacity: 0.7;">Tidak ada guru untuk mata pelajaran ini.</td></tr>';
+        }
+    }
+
+    function renderSubjectBoxes(page) {
+        const start = page * itemsPerPage;
+        const end = start + itemsPerPage;
+        const subjectsToDisplay = subjectNames.slice(start, end);
+
+        subjectGridContainer.innerHTML = '';
+
+        subjectsToDisplay.forEach(subjectName => {
+            const subjectBox = document.createElement('div');
+            subjectBox.classList.add('subject-box');
+            subjectBox.innerHTML = `<h3>${subjectName}</h3>`;
+            subjectBox.dataset.subject = subjectName;
+
+            subjectBox.addEventListener('click', () => {
+                showTeacherModal(subjectName);
+            });
+            subjectGridContainer.appendChild(subjectBox);
+        });
+
+        currentPageDisplay.textContent = page + 1;
+        totalPagesDisplay.textContent = totalPages;
+    }
+
     const savedMode = localStorage.getItem('theme');
     if (savedMode) {
         body.classList.add(savedMode);
@@ -131,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Date Display Logic ---
     function updateJakartaDate() {
         const now = new Date();
         const options = {
@@ -146,7 +273,23 @@ document.addEventListener('DOMContentLoaded', () => {
     updateJakartaDate();
     setInterval(updateJakartaDate, 60 * 1000);
 
-    // --- Jadwal View Logic ---
+    function updateRealTimeWIB() {
+        const now = new Date();
+        const options = {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZone: 'Asia/Jakarta'
+        };
+        const formattedTime = now.toLocaleTimeString('en-US', options);
+        if (realTimeWIB) {
+            realTimeWIB.textContent = formattedTime;
+        }
+    }
+    updateRealTimeWIB();
+    setInterval(updateRealTimeWIB, 1000);
+
+
     function populateDayDropdown() {
         customDayDropdown.innerHTML = '';
         days.forEach((day, index) => {
@@ -215,7 +358,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSelectedDayClass();
     }
 
-    // --- User Profile Management ---
     function loadUserProfile() {
         const storedProfile = localStorage.getItem('userProfile');
         if (storedProfile) {
@@ -238,53 +380,44 @@ document.addEventListener('DOMContentLoaded', () => {
         profilePhoto.src = currentUserProfile.photo || "https://via.placeholder.com/100";
     }
 
-    // --- View Management with Animations ---
-    const allViews = [mainView, jadwalView, settingsView, profileView, loginView];
-    const ANIMATION_DURATION = 300; // ms, matches CSS transition duration
+    const ANIMATION_DURATION = 300;
 
     function showView(viewToShow) {
-        if (viewToShow === currentActiveView) return; // Prevent transition to same view
+        if (viewToShow === currentActiveView) return;
 
         const previousView = currentActiveView;
 
-        // Step 1: Animate out the current view (if any)
         if (previousView) {
-            previousView.classList.add('view-exit'); // Start exit animation
-            previousView.style.pointerEvents = 'none'; // Disable clicks during exit
-            previousView.style.position = 'absolute'; // Take out of flow to prevent reflow issues
-            previousView.style.zIndex = 1; // Ensure it's above new view during exit
+            previousView.classList.add('view-exit');
+            previousView.style.pointerEvents = 'none';
+            previousView.style.position = 'absolute';
+            previousView.style.zIndex = 1;
         }
 
-        // Step 2: Prepare the new view for entrance animation
-        viewToShow.classList.add('view-enter'); // Apply initial state for entrance
-        viewToShow.classList.remove('hidden-view'); // Make it visible (but opaque/transformed)
-        viewToShow.style.position = 'static'; // Allow it to take up space
-        viewToShow.style.zIndex = 2; // Ensure it's above old view
+        viewToShow.classList.add('view-enter');
+        viewToShow.classList.remove('hidden-view');
+        viewToShow.style.position = 'static';
+        viewToShow.style.zIndex = 2;
 
-        // Step 3: Wait for current view to animate out, then animate new view in
         setTimeout(() => {
             if (previousView) {
                 previousView.classList.remove('active-view', 'view-exit');
-                previousView.classList.add('hidden-view'); // Fully hide after exit
-                previousView.style.pointerEvents = ''; // Reset
-                previousView.style.position = ''; // Reset
-                previousView.style.zIndex = ''; // Reset
+                previousView.classList.add('hidden-view');
+                previousView.style.pointerEvents = '';
+                previousView.style.position = '';
+                previousView.style.zIndex = '';
             }
 
-            viewToShow.classList.remove('view-enter'); // Remove initial entrance state
-            viewToShow.classList.add('active-view', 'view-enter-active'); // Start entrance animation
-            currentActiveView = viewToShow; // Update active view
+            viewToShow.classList.remove('view-enter');
+            viewToShow.classList.add('active-view', 'view-enter-active');
+            currentActiveView = viewToShow;
 
-            // After entrance animation completes, remove active state and reset transforms
-            // This is important for smooth re-transitions and avoiding lingering transform states
             setTimeout(() => {
                 viewToShow.classList.remove('view-enter-active');
-                viewToShow.style.opacity = ''; // Reset inline styles
-                viewToShow.style.transform = ''; // Reset inline styles
+                viewToShow.style.opacity = '';
+                viewToShow.style.transform = '';
             }, ANIMATION_DURATION);
 
-
-            // --- Update Top Bar Visibility ---
             headerSearchSection.style.display = 'flex';
             headerModeToggle.style.display = 'flex';
             globalTopBar.style.justifyContent = 'space-between';
@@ -292,17 +425,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (viewToShow === loginView) {
                 headerSearchSection.style.display = 'none';
                 headerModeToggle.style.display = 'none';
-                // Justify-content is handled by .login-specific-top-bar in HTML for this view
             } else {
-                // Default visibility
             }
 
-            toggleDayDropdown(false); // Always close custom dropdown
-            headerSearchInput.value = ''; // Clear search input
+            toggleDayDropdown(false);
+            headerSearchInput.value = '';
+
+            if (viewToShow === teacherView) {
+                renderSubjectBoxes(currentTeacherPage);
+            }
         }, ANIMATION_DURATION);
     }
 
-    // --- Navigation Functions ---
     function showMainView() {
         showView(mainView);
     }
@@ -338,34 +472,68 @@ document.addEventListener('DOMContentLoaded', () => {
         inputNIS.value = currentUserProfile.nis !== "Belum diisi" ? currentUserProfile.nis : "";
     }
 
-    // --- Event Listeners ---
+    function showOtherView() {
+        showView(otherView);
+    }
+
+    function showTeacherView() {
+        showView(teacherView);
+    }
+
+    function showTeacherModal(subject) {
+        modalSubjectTitle.textContent = subject;
+        populateTeacherTable(subject);
+        teacherDetailModalOverlay.classList.add('visible');
+        body.style.overflow = 'hidden';
+    }
+
+    function hideTeacherModal() {
+        teacherDetailModalOverlay.classList.remove('visible');
+        body.style.overflow = '';
+    }
+
     jadwalBox.addEventListener('click', showJadwalView);
+    othersBox.addEventListener('click', showOtherView);
+    teacherBox.addEventListener('click', showTeacherView);
     settingsButtonFooter.addEventListener('click', showSettingsView);
     profileSettingsItem.addEventListener('click', showProfileView);
     profileLoginButton.addEventListener('click', showLoginView);
     
-    // Login Back button (only back button that exists in the HTML for login)
-    loginBackButton.addEventListener('click', showProfileView); // Back from Login always goes to Profile
+    loginBackButton.addEventListener('click', showProfileView);
 
-    // Global Home button (in footer)
-    globalHomeButtonFooter.addEventListener('click', showMainView); // Always navigate to main view
+    globalHomeButtonFooter.addEventListener('click', showMainView);
 
-    // Day navigation arrows (in Jadwal view)
     prevDayArrow.addEventListener('click', () => {
-        currentDayIndex = (currentDayIndex - 1 + days.length) % days.length; // Ensure cyclic
+        currentDayIndex = (currentDayIndex - 1 + days.length) % days.length;
         currentDayDisplay.textContent = days[currentDayIndex];
         displayJadwal(days[currentDayIndex]);
         updateSelectedDayClass();
     });
 
     nextDayArrow.addEventListener('click', () => {
-        currentDayIndex = (currentDayIndex + 1) % days.length; // Ensure cyclic
+        currentDayIndex = (currentDayIndex + 1) % days.length;
         currentDayDisplay.textContent = days[currentDayIndex];
         displayJadwal(days[currentDayIndex]);
         updateSelectedDayClass();
     });
 
-    // --- Login Form Submission ---
+    prevSubjectPageArrow.addEventListener('click', () => {
+        currentTeacherPage = (currentTeacherPage - 1 + totalPages) % totalPages;
+        renderSubjectBoxes(currentTeacherPage);
+    });
+
+    nextSubjectPageArrow.addEventListener('click', () => {
+        currentTeacherPage = (currentTeacherPage + 1) % totalPages;
+        renderSubjectBoxes(currentTeacherPage);
+    });
+
+    closeTeacherModalButton.addEventListener('click', hideTeacherModal);
+    teacherDetailModalOverlay.addEventListener('click', (event) => {
+        if (event.target === teacherDetailModalOverlay) {
+            hideTeacherModal();
+        }
+    });
+
     loginForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
@@ -376,10 +544,9 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUserProfile.nis = inputNIS.value.trim() || "Belum diisi";
 
         saveUserProfile();
-        showProfileView(); // Go back to profile view after login
+        showProfileView();
     });
 
-    // --- Profile Photo Upload ---
     uploadPhotoIcon.addEventListener('click', () => {
         profilePhotoUpload.click();
     });
@@ -396,7 +563,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- General Dropdown & Navigation Click Handlers ---
     dayDisplayBubble.addEventListener('click', (event) => {
         if (!event.target.classList.contains('custom-dropdown-item')) {
             toggleDayDropdown();
@@ -409,7 +575,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initial load for profile data and set initial view
     loadUserProfile();
-    showMainView(); // Start with main view
+    showMainView();
 });
