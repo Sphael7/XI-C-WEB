@@ -30,11 +30,11 @@
                     <h3>Murid</h3>
                     <p>Data dan informasi detail mengenai murid.</p>
                 </div>
-                <div class="grid-item item-3">
+                <div class="grid-item item-3" id="teacher-box">
                     <h3>Guru</h3>
                     <p>Profil dan jadwal mengajar para guru.</p>
                 </div>
-                <div class="grid-item item-4">
+                <div class="grid-item item-4" id="others-box">
                     <h3>Lainnya</h3>
                     <p>Menu dan fitur tambahan yang relevan.</p>
                 </div>
@@ -52,7 +52,7 @@
                     <span id="current-day-display">Senin</span>
                     <i class="fas fa-caret-down dropdown-arrow"></i>
                     <div class="custom-dropdown-content" id="custom-day-dropdown">
-                        </div>
+                    </div>
                 </div>
                 <i class="fas fa-chevron-right day-nav-arrow" id="next-day"></i>
             </div>
@@ -126,22 +126,27 @@
                     <div class="input-group">
                         <label for="input-nama">Nama:</label>
                         <input type="text" id="input-nama" placeholder="Diisi nama lengkap">
+                        <p class="error-message" id="error-nama"></p>
                     </div>
                     <div class="input-group">
                         <label for="input-kelas">Kelas:</label>
                         <input type="text" id="input-kelas" placeholder="Diisi kelas (misal: XI-C)">
+                        <p class="error-message" id="error-kelas"></p>
                     </div>
                     <div class="input-group">
                         <label for="input-absen">No. Absen:</label>
                         <input type="number" id="input-absen" placeholder="Diisi No. Absen">
+                        <p class="error-message" id="error-absen"></p>
                     </div>
                     <div class="input-group">
                         <label for="input-nisn">NISN:</label>
                         <input type="number" id="input-nisn" placeholder="Diisi NISN">
+                        <p class="error-message" id="error-nisn"></p>
                     </div>
                     <div class="input-group">
                         <label for="input-nis">NIS:</label>
                         <input type="number" id="input-nis" placeholder="Diisi NIS">
+                        <p class="error-message" id="error-nis"></p>
                     </div>
                     <button type="submit" class="lets-go-button">Let's Go!</button>
                 </form>
@@ -150,6 +155,37 @@
                 <p class="copyright-text"><i class="far fa-copyright copyright-icon"></i> 2025</p>
             </footer>
         </div>
+
+        <div id="other-view" class="hidden-view">
+            <main class="other-content">
+                <div class="other-item" id="ebook-box">
+                    <h3>E-Book</h3>
+                    <p>Berisi kumpulan E-Book mata pelajaran.</p>
+                </div>
+                <div class="other-item" id="komitmen-box">
+                    <h3>Komitmen</h3>
+                    <p>Daftar komitmen.</p>
+                </div>
+                <div class="time-display-section">
+                    <span id="real-time-wib">00:00</span>
+                </div>
+            </main>
+        </div>
+
+        <div id="teacher-view" class="hidden-view">
+            <main class="teacher-content">
+                <div class="subject-grid-container">
+                    </div>
+                <div class="pagination-controls">
+                    <i class="fas fa-chevron-left pagination-arrow" id="prev-subject-page"></i>
+                    <span class="page-number-display">
+                        Page <span id="current-page-display">1</span> of <span id="total-pages-display">1</span>
+                    </span>
+                    <i class="fas fa-chevron-right pagination-arrow" id="next-subject-page"></i>
+                </div>
+            </main>
+        </div>
+
 
         <footer class="bottom-bar" id="global-bottom-bar">
             <div class="back-button" id="global-home-button-footer">
@@ -162,6 +198,30 @@
                 <i class="fas fa-cog"></i>
             </div>
         </footer>
+    </div>
+
+    <div id="teacher-detail-modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-subject-title">Mata Pelajaran Guru</h3>
+                <i class="fas fa-times close-modal-button" id="close-teacher-modal"></i>
+            </div>
+            <div class="modal-body">
+                <div class="modal-table-container">
+                    <table class="teacher-modal-table">
+                        <thead>
+                            <tr>
+                                <th>Kode</th>
+                                <th>Nama</th>
+                                <th>Mapel</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-teacher-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
