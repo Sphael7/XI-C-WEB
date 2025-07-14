@@ -4,21 +4,70 @@ document.addEventListener('DOMContentLoaded', () => {
     const modeIcon = modeToggle.querySelector('.mode-icon');
     const currentDateElement = document.getElementById('current-date');
 
+    // Global Header elements
+    const globalTopBar = document.getElementById('global-top-bar');
+    const headerSearchSection = globalTopBar.querySelector('.search-section');
+    const headerSearchInput = globalTopBar.querySelector('.search-input');
+    const headerModeToggle = globalTopBar.querySelector('.mode-toggle');
+
+    // Views
     const mainView = document.getElementById('main-view');
     const jadwalView = document.getElementById('jadwal-view');
-    const jadwalBox = document.getElementById('jadwal-box');
-    const globalBackButton = document.getElementById('global-back-button');
+    const settingsView = document.getElementById('settings-view');
+    const profileView = document.getElementById('profile-view');
+    const loginView = document.getElementById('login-view');
 
+    // Main Page elements
+    const jadwalBox = document.getElementById('jadwal-box');
+    const settingsButtonFooter = document.getElementById('settings-button-footer-main');
+    const globalHomeButtonFooter = document.getElementById('global-home-button-footer'); // Home button reference
+
+    // Jadwal View elements
     const dayDisplayBubble = document.getElementById('day-display-bubble');
     const currentDayDisplay = document.getElementById('current-day-display');
-    const dropdownArrow = document.querySelector('.dropdown-arrow'); // Select the arrow for rotation
-    const customDayDropdown = document.getElementById('custom-day-dropdown'); // The new custom dropdown div
+    const dropdownArrow = document.querySelector('.dropdown-arrow');
+    const customDayDropdown = document.getElementById('custom-day-dropdown');
     const prevDayArrow = document.getElementById('prev-day');
     const nextDayArrow = document.getElementById('next-day');
     const jadwalList = document.getElementById('jadwal-list');
-
     const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
-    let currentDayIndex = 0; // Initialize to Senin
+    let currentDayIndex = 0;
+
+    // Settings View elements
+    const profileSettingsItem = document.getElementById('profile-settings-item');
+
+    // Profile View elements
+    const profilePhoto = document.getElementById('profile-photo');
+    const profilePhotoUpload = document.getElementById('profile-photo-upload');
+    const uploadPhotoIcon = document.getElementById('upload-photo-icon');
+    const profileNama = document.getElementById('profile-nama');
+    const profileKelas = document.getElementById('profile-kelas');
+    const profileAbsen = document.getElementById('profile-absen');
+    const profileNISN = document.getElementById('profile-nisn');
+    const profileNIS = document.getElementById('profile-nis');
+    const profileLoginButton = document.getElementById('profile-login-button');
+
+    // Login View elements
+    const loginBackButton = document.getElementById('login-back-button'); // The ONLY back button left
+    const loginForm = document.getElementById('login-form');
+    const inputNama = document.getElementById('input-nama');
+    const inputKelas = document.getElementById('input-kelas');
+    const inputAbsen = document.getElementById('input-absen');
+    const inputNISN = document.getElementById('input-nisn');
+    const inputNIS = document.getElementById('input-nis');
+
+    // --- State and Data Management ---
+    let currentUserProfile = {
+        nama: "Belum diisi",
+        kelas: "Belum diisi",
+        absen: "Belum diisi",
+        nisn: "Belum diisi",
+        nis: "Belum diisi",
+        photo: "https://via.placeholder.com/100"
+    };
+
+    // --- Navigation State (simplified as history is not tracked for Home button) ---
+    let currentActiveView = null; // To track the currently displayed view element
 
     const jadwalData = {
         "Senin": [
@@ -54,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
+    // --- Theme Toggle Logic ---
     const savedMode = localStorage.getItem('theme');
     if (savedMode) {
         body.classList.add(savedMode);
@@ -81,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Date Display Logic ---
     function updateJakartaDate() {
         const now = new Date();
         const options = {
@@ -92,34 +143,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedDate = now.toLocaleDateString('en-US', options);
         currentDateElement.textContent = `XI-C — ${formattedDate}`;
     }
-
     updateJakartaDate();
     setInterval(updateJakartaDate, 60 * 1000);
 
-    // Function to generate custom dropdown items
+    // --- Jadwal View Logic ---
     function populateDayDropdown() {
-        customDayDropdown.innerHTML = ''; // Clear previous items
+        customDayDropdown.innerHTML = '';
         days.forEach((day, index) => {
             const item = document.createElement('div');
             item.classList.add('custom-dropdown-item');
             item.textContent = day;
             item.dataset.dayIndex = index;
             if (index === currentDayIndex) {
-                item.classList.add('selected'); // Mark current day as selected
+                item.classList.add('selected');
             }
             item.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent bubble click from closing immediately
+                event.stopPropagation();
                 currentDayIndex = parseInt(event.target.dataset.dayIndex);
                 currentDayDisplay.textContent = days[currentDayIndex];
                 displayJadwal(days[currentDayIndex]);
-                toggleDayDropdown(false); // Hide dropdown after selection
+                toggleDayDropdown(false);
                 updateSelectedDayClass();
             });
             customDayDropdown.appendChild(item);
         });
     }
 
-    // Function to update selected class in custom dropdown
     function updateSelectedDayClass() {
         document.querySelectorAll('.custom-dropdown-item').forEach((item, index) => {
             if (index === currentDayIndex) {
@@ -129,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
 
     function displayJadwal(day) {
         jadwalList.innerHTML = '';
@@ -154,78 +202,214 @@ document.addEventListener('DOMContentLoaded', () => {
         if (show === true) {
             dayDisplayBubble.classList.add('open');
             customDayDropdown.classList.add('show');
-            dropdownArrow.classList.add('rotated'); // Rotate arrow
+            dropdownArrow.classList.add('rotated');
         } else if (show === false) {
             dayDisplayBubble.classList.remove('open');
             customDayDropdown.classList.remove('show');
-            dropdownArrow.classList.remove('rotated'); // Reset arrow rotation
-        } else { // Toggle
+            dropdownArrow.classList.remove('rotated');
+        } else {
             dayDisplayBubble.classList.toggle('open');
             customDayDropdown.classList.toggle('show');
             dropdownArrow.classList.toggle('rotated');
         }
-        updateSelectedDayClass(); // Update selected state when dropdown opens/closes
+        updateSelectedDayClass();
+    }
+
+    // --- User Profile Management ---
+    function loadUserProfile() {
+        const storedProfile = localStorage.getItem('userProfile');
+        if (storedProfile) {
+            currentUserProfile = JSON.parse(storedProfile);
+        }
+        updateProfileDisplay();
+    }
+
+    function saveUserProfile() {
+        localStorage.setItem('userProfile', JSON.stringify(currentUserProfile));
+        updateProfileDisplay();
+    }
+
+    function updateProfileDisplay() {
+        profileNama.textContent = currentUserProfile.nama || "Belum diisi";
+        profileKelas.textContent = currentUserProfile.kelas || "Belum diisi";
+        profileAbsen.textContent = currentUserProfile.absen || "Belum diisi";
+        profileNISN.textContent = currentUserProfile.nisn || "Belum diisi";
+        profileNIS.textContent = currentUserProfile.nis || "Belum diisi";
+        profilePhoto.src = currentUserProfile.photo || "https://via.placeholder.com/100";
+    }
+
+    // --- View Management with Animations ---
+    const allViews = [mainView, jadwalView, settingsView, profileView, loginView];
+    const ANIMATION_DURATION = 300; // ms, matches CSS transition duration
+
+    function showView(viewToShow) {
+        if (viewToShow === currentActiveView) return; // Prevent transition to same view
+
+        const previousView = currentActiveView;
+
+        // Step 1: Animate out the current view (if any)
+        if (previousView) {
+            previousView.classList.add('view-exit'); // Start exit animation
+            previousView.style.pointerEvents = 'none'; // Disable clicks during exit
+            previousView.style.position = 'absolute'; // Take out of flow to prevent reflow issues
+            previousView.style.zIndex = 1; // Ensure it's above new view during exit
+        }
+
+        // Step 2: Prepare the new view for entrance animation
+        viewToShow.classList.add('view-enter'); // Apply initial state for entrance
+        viewToShow.classList.remove('hidden-view'); // Make it visible (but opaque/transformed)
+        viewToShow.style.position = 'static'; // Allow it to take up space
+        viewToShow.style.zIndex = 2; // Ensure it's above old view
+
+        // Step 3: Wait for current view to animate out, then animate new view in
+        setTimeout(() => {
+            if (previousView) {
+                previousView.classList.remove('active-view', 'view-exit');
+                previousView.classList.add('hidden-view'); // Fully hide after exit
+                previousView.style.pointerEvents = ''; // Reset
+                previousView.style.position = ''; // Reset
+                previousView.style.zIndex = ''; // Reset
+            }
+
+            viewToShow.classList.remove('view-enter'); // Remove initial entrance state
+            viewToShow.classList.add('active-view', 'view-enter-active'); // Start entrance animation
+            currentActiveView = viewToShow; // Update active view
+
+            // After entrance animation completes, remove active state and reset transforms
+            // This is important for smooth re-transitions and avoiding lingering transform states
+            setTimeout(() => {
+                viewToShow.classList.remove('view-enter-active');
+                viewToShow.style.opacity = ''; // Reset inline styles
+                viewToShow.style.transform = ''; // Reset inline styles
+            }, ANIMATION_DURATION);
+
+
+            // --- Update Top Bar Visibility ---
+            headerSearchSection.style.display = 'flex';
+            headerModeToggle.style.display = 'flex';
+            globalTopBar.style.justifyContent = 'space-between';
+
+            if (viewToShow === loginView) {
+                headerSearchSection.style.display = 'none';
+                headerModeToggle.style.display = 'none';
+                // Justify-content is handled by .login-specific-top-bar in HTML for this view
+            } else {
+                // Default visibility
+            }
+
+            toggleDayDropdown(false); // Always close custom dropdown
+            headerSearchInput.value = ''; // Clear search input
+        }, ANIMATION_DURATION);
+    }
+
+    // --- Navigation Functions ---
+    function showMainView() {
+        showView(mainView);
     }
 
     function showJadwalView() {
-        mainView.classList.remove('active-view');
-        mainView.classList.add('hidden-view');
-        jadwalView.classList.remove('hidden-view');
-        jadwalView.classList.add('active-view');
-        
-        // Initialize day for jadwal view
-        // Optional: set to current real-world day if within Monday-Friday, otherwise Monday
-        const todayReal = new Date().getDay(); // 0=Sunday, 1=Monday...
-        if (todayReal >= 1 && todayReal <= 5) { // Monday to Friday
-            currentDayIndex = todayReal - 1; // Adjust for 0-indexed array
+        showView(jadwalView);
+        const todayReal = new Date().getDay();
+        if (todayReal >= 1 && todayReal <= 5) {
+            currentDayIndex = todayReal - 1;
         } else {
-            currentDayIndex = 0; // Default to Monday
+            currentDayIndex = 0;
         }
-
         currentDayDisplay.textContent = days[currentDayIndex];
         displayJadwal(days[currentDayIndex]);
-        populateDayDropdown(); // Populate dropdown when entering jadwal view
+        populateDayDropdown();
     }
 
-    function showMainView() {
-        jadwalView.classList.remove('active-view');
-        jadwalView.classList.add('hidden-view');
-        mainView.classList.remove('hidden-view');
-        mainView.classList.add('active-view');
-        toggleDayDropdown(false); // Ensure dropdown is closed when leaving view
+    function showSettingsView() {
+        showView(settingsView);
     }
 
-    // Event Listeners
+    function showProfileView() {
+        showView(profileView);
+        loadUserProfile();
+    }
+
+    function showLoginView() {
+        showView(loginView);
+        inputNama.value = currentUserProfile.nama !== "Belum diisi" ? currentUserProfile.nama : "";
+        inputKelas.value = currentUserProfile.kelas !== "Belum diisi" ? currentUserProfile.kelas : "";
+        inputAbsen.value = currentUserProfile.absen !== "Belum diisi" ? currentUserProfile.absen : "";
+        inputNISN.value = currentUserProfile.nisn !== "Belum diisi" ? currentUserProfile.nisn : "";
+        inputNIS.value = currentUserProfile.nis !== "Belum diisi" ? currentUserProfile.nis : "";
+    }
+
+    // --- Event Listeners ---
     jadwalBox.addEventListener('click', showJadwalView);
-    globalBackButton.addEventListener('click', showMainView);
+    settingsButtonFooter.addEventListener('click', showSettingsView);
+    profileSettingsItem.addEventListener('click', showProfileView);
+    profileLoginButton.addEventListener('click', showLoginView);
+    
+    // Login Back button (only back button that exists in the HTML for login)
+    loginBackButton.addEventListener('click', showProfileView); // Back from Login always goes to Profile
 
-    // Day navigation arrows
+    // Global Home button (in footer)
+    globalHomeButtonFooter.addEventListener('click', showMainView); // Always navigate to main view
+
+    // Day navigation arrows (in Jadwal view)
     prevDayArrow.addEventListener('click', () => {
-        currentDayIndex = (currentDayIndex - 1 + days.length) % days.length;
+        currentDayIndex = (currentDayIndex - 1 + days.length) % days.length; // Ensure cyclic
         currentDayDisplay.textContent = days[currentDayIndex];
         displayJadwal(days[currentDayIndex]);
-        updateSelectedDayClass(); // Update selected class
+        updateSelectedDayClass();
     });
 
     nextDayArrow.addEventListener('click', () => {
-        currentDayIndex = (currentDayIndex + 1) % days.length;
+        currentDayIndex = (currentDayIndex + 1) % days.length; // Ensure cyclic
         currentDayDisplay.textContent = days[currentDayIndex];
         displayJadwal(days[currentDayIndex]);
-        updateSelectedDayClass(); // Update selected class
+        updateSelectedDayClass();
     });
 
-    // Custom dropdown toggle
+    // --- Login Form Submission ---
+    loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        currentUserProfile.nama = inputNama.value.trim() || "Belum diisi";
+        currentUserProfile.kelas = inputKelas.value.trim() || "Belum diisi";
+        currentUserProfile.absen = inputAbsen.value.trim() || "Belum diisi";
+        currentUserProfile.nisn = inputNISN.value.trim() || "Belum diisi";
+        currentUserProfile.nis = inputNIS.value.trim() || "Belum diisi";
+
+        saveUserProfile();
+        showProfileView(); // Go back to profile view after login
+    });
+
+    // --- Profile Photo Upload ---
+    uploadPhotoIcon.addEventListener('click', () => {
+        profilePhotoUpload.click();
+    });
+
+    profilePhotoUpload.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentUserProfile.photo = e.target.result;
+                saveUserProfile();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // --- General Dropdown & Navigation Click Handlers ---
     dayDisplayBubble.addEventListener('click', (event) => {
-        // Only toggle if the click isn't on a dropdown item itself (handled by item's click listener)
         if (!event.target.classList.contains('custom-dropdown-item')) {
             toggleDayDropdown();
         }
     });
 
-    // Hide dropdown if clicked outside
     document.addEventListener('click', (event) => {
         if (!dayDisplayBubble.contains(event.target) && !customDayDropdown.contains(event.target)) {
             toggleDayDropdown(false);
         }
     });
+
+    // Initial load for profile data and set initial view
+    loadUserProfile();
+    showMainView(); // Start with main view
 });
