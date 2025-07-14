@@ -5,26 +5,61 @@ body {
     color: #E0BBE4;
     background-color: #120D1D;
     transition: background-color 0.5s ease, color 0.5s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    display: flex; /* Keep flex for vertical stacking if needed, but remove centering */
+    flex-direction: column; /* Stack content vertically */
+    min-height: 100vh; /* Ensure it takes full viewport height */
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .container {
-    width: 90%;
-    max-width: 600px;
-    background-color: #1C152B;
-    border-radius: 25px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-    padding: 25px;
+    width: 100%; /* Make container take full width */
+    max-width: none; /* Remove max-width constraint */
+    background-color: #1C152B; /* Background color for dark mode */
+    border-radius: 0; /* Remove border-radius for full screen edge-to-edge */
+    box-shadow: none; /* Remove box-shadow as it's now full screen */
+    padding: 0; /* Remove padding from container itself, add to child elements */
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    border: 2px solid #5A2D8D;
-    overflow: hidden;
+    flex-grow: 1; /* Allow container to fill available height */
 }
 
+/* Adjust padding for elements inside the container */
+.top-bar,
+.bottom-bar,
+.content-grid,
+.day-selector-container,
+.jadwal-list {
+    padding-left: 20px; /* Consistent padding from screen edges */
+    padding-right: 20px;
+}
+
+/* Re-apply specific padding where needed (e.g., top/bottom for bars) */
+.top-bar {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+.bottom-bar {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+/* Ensure padding for individual items if needed */
+.grid-item,
+.jadwal-item {
+    padding: 20px; /* Keep internal padding for items */
+}
+
+/* Remove margin for content-grid to make it stretch */
+.content-grid {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-left: 20px; /* Apply padding here instead of on container */
+    padding-right: 20px;
+    box-sizing: border-box; /* Include padding in width calculation */
+    width: 100%; /* Ensure it spans full width including padding */
+}
+
+/* Active and Hidden View Management */
 .active-view {
     display: flex;
     flex-direction: column;
@@ -36,6 +71,7 @@ body {
     display: none;
 }
 
+
 /* Dark Mode Specific Styles */
 body.dark-mode {
     background-color: #120D1D;
@@ -44,12 +80,13 @@ body.dark-mode {
 
 body.dark-mode .container {
     background-color: #1C152B;
-    border: 2px solid #5A2D8D;
+    border: none; /* Remove border in dark mode for full screen */
 }
 
 body.dark-mode .top-bar {
     background-color: #351C5C;
-    border: 1px solid #4B277C;
+    border-bottom: 1px solid #4B277C; /* Use bottom border for separation */
+    border-radius: 0; /* Remove border radius */
 }
 
 body.dark-mode .search-input {
@@ -129,7 +166,8 @@ body.dark-mode .grid-item.item-5 p {
 
 body.dark-mode .bottom-bar {
     background-color: #351C5C;
-    border: 1px solid #4B277C;
+    border-top: 1px solid #4B277C; /* Use top border for separation */
+    border-radius: 0; /* Remove border radius */
 }
 
 body.dark-mode .bottom-bar i,
@@ -145,13 +183,13 @@ body.light-mode {
 
 body.light-mode .container {
     background-color: #FFFFFF;
-    border: 1px solid #E0E0E0;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    border: none;
 }
 
 body.light-mode .top-bar {
     background-color: #F0F0F0;
-    border: 1px solid #EAEAEA;
+    border-bottom: 1px solid #EAEAEA;
+    border-radius: 0;
 }
 
 body.light-mode .search-input {
@@ -231,7 +269,8 @@ body.light-mode .grid-item.item-5 p {
 
 body.light-mode .bottom-bar {
     background-color: #F0F0F0;
-    border: 1px solid #EAEAEA;
+    border-top: 1px solid #EAEAEA;
+    border-radius: 0;
 }
 
 body.light-mode .bottom-bar i,
@@ -244,9 +283,8 @@ body.light-mode .bottom-bar span {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 0; /* No border radius for full width */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Lighter shadow for full-width bar */
 }
 
 .search-section {
@@ -287,6 +325,8 @@ body.light-mode .bottom-bar span {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: auto auto auto;
     gap: 20px;
+    padding-top: 0; /* Adjust internal padding of the grid if needed */
+    padding-bottom: 0; /* Adjust internal padding of the grid if needed */
 }
 
 .grid-item {
@@ -330,9 +370,8 @@ body.light-mode .bottom-bar span {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border-radius: 0; /* No border radius for full width */
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1); /* Lighter shadow for full-width bar */
 }
 
 .back-button,
@@ -345,15 +384,14 @@ body.light-mode .bottom-bar span {
 }
 
 .back-button i {
-    margin: 0 5px; /* Tetap pertahankan margin untuk ikon back */
+    margin: 0 5px;
     font-size: 1.2em;
 }
 
 .settings-button i {
-    margin: 0; /* Hapus margin agar ikon berada di tengah jika tidak ada teks */
+    margin: 0; /* Remove margin as there's no text */
     font-size: 1.2em;
 }
-
 
 body.dark-mode .current-date {
     font-size: 1.1em;
@@ -381,6 +419,9 @@ body.light-mode .current-date {
     align-items: center;
     width: 100%;
     margin-bottom: 20px;
+    padding-left: 20px; /* Apply padding for arrows and bubble container */
+    padding-right: 20px;
+    box-sizing: border-box;
 }
 
 .day-nav-arrow {
@@ -417,11 +458,12 @@ body.light-mode .day-nav-arrow:hover {
     font-size: 1.4em;
     font-family: 'Playfair Display', serif;
     font-weight: 700;
-    position: relative; /* Crucial for positioning custom dropdown */
+    position: relative;
     box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    overflow: visible; /* Allow dropdown content to escape bounds */
-    z-index: 5; /* Ensure bubble is above other content when dropdown is open */
+    overflow: visible;
+    z-index: 5;
+    margin: 0 10px; /* Space between arrows and bubble */
 }
 
 body.dark-mode .day-display-bubble {
@@ -448,20 +490,20 @@ body.light-mode .day-display-bubble {
 /* Custom Dropdown Content Styling */
 .custom-dropdown-content {
     position: absolute;
-    top: calc(100% + 10px); /* Position below the bubble, with a small gap */
+    top: calc(100% + 10px);
     left: 0;
     right: 0;
     border-radius: 15px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-    overflow: hidden; /* Hide overflow during animation */
-    max-height: 0; /* Hidden by default */
-    opacity: 0; /* Hidden by default */
-    transition: max-height 0.5s ease-out, opacity 0.5s ease-out; /* Animation */
-    z-index: 10; /* Ensure it's above other elements */
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+    z-index: 10;
 }
 
 .custom-dropdown-content.show {
-    max-height: 250px; /* Adjust based on content height */
+    max-height: 250px;
     opacity: 1;
 }
 
@@ -520,6 +562,8 @@ body.light-mode .custom-dropdown-item.selected {
     flex-direction: column;
     gap: 15px;
     width: 100%;
+    padding-bottom: 20px; /* Add padding to the bottom of the list */
+    box-sizing: border-box;
 }
 
 .jadwal-item {
@@ -591,12 +635,22 @@ body.light-mode .jadwal-item .mapel {
     }
 
     .container {
-        padding: 15px;
+        padding: 0; /* Ensure no extra padding on container for small screens */
+    }
+
+    .top-bar,
+    .bottom-bar,
+    .content-grid,
+    .day-selector-container,
+    .jadwal-list {
+        padding-left: 15px; /* Slightly less padding on very small screens */
+        padding-right: 15px;
     }
 
     .top-bar,
     .bottom-bar {
-        padding: 10px 15px;
+        padding-top: 10px;
+        padding-bottom: 10px;
     }
 
     .search-input {
@@ -622,6 +676,7 @@ body.light-mode .jadwal-item .mapel {
     .day-display-bubble {
         font-size: 1.2em;
         padding: 10px 15px;
+        margin: 0 5px; /* Reduce margin on smaller screens */
     }
 
     .jadwal-item .mapel {
