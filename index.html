@@ -26,7 +26,7 @@
                     <h3>Jadwal</h3>
                     <p>Informasi jadwal pelajaran, ujian, dan kegiatan lainnya.</p>
                 </div>
-                <div class="grid-item item-2">
+                <div class="grid-item item-2" id="student-box">
                     <h3>Murid</h3>
                     <p>Data dan informasi detail mengenai murid.</p>
                 </div>
@@ -38,7 +38,7 @@
                     <h3>Lainnya</h3>
                     <p>Menu dan fitur tambahan yang relevan.</p>
                 </div>
-                <div class="grid-item item-5">
+                <div class="grid-item item-5" id="announcement-box">
                     <h3>Pengumuman Penting</h3>
                     <p>Informasi dan pengumuman terbaru.</p>
                 </div>
@@ -184,6 +184,140 @@
                     <i class="fas fa-chevron-right pagination-arrow" id="next-subject-page"></i>
                 </div>
             </main>
+        </div>
+
+        <div id="student-view" class="hidden-view">
+            <main class="student-content">
+                <h2 class="student-title">Data Murid XI-C</h2>
+                <div class="student-table-container">
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>NIS</th>
+                                <th>NISN</th>
+                                <th>Nama</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body">
+                            </tbody>
+                    </table>
+                </div>
+                <div class="pagination-controls student-pagination-controls">
+                    <i class="fas fa-chevron-left pagination-arrow" id="prev-student-page"></i>
+                    <span class="page-number-display">
+                        Page <span id="current-student-page-display">1</span> of <span id="total-student-pages-display">1</span>
+                    </span>
+                    <i class="fas fa-chevron-right pagination-arrow" id="next-student-page"></i>
+                </div>
+            </main>
+        </div>
+
+        <div id="announcement-view" class="hidden-view">
+            <main class="announcement-content">
+                <h2 class="announcement-title">Pengumuman</h2>
+                <div class="announcement-table-container">
+                    <table class="announcement-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Judul</th>
+                                <th>Mata Pelajaran</th>
+                                <th>Isi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="announcement-table-body">
+                            </tbody>
+                    </table>
+                </div>
+                <div class="pagination-controls announcement-pagination-controls">
+                    <i class="fas fa-chevron-left pagination-arrow" id="prev-announcement-page"></i>
+                    <span class="page-number-display">
+                        Page <span id="current-announcement-page-display">1</span> of <span id="total-announcement-pages-display">1</span>
+                    </span>
+                    <i class="fas fa-chevron-right pagination-arrow" id="next-announcement-page"></i>
+                </div>
+                <div class="add-announcement-button-container">
+                    <button class="add-announcement-button" id="add-announcement-button">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <div id="add-announcement-view" class="hidden-view">
+            <header class="top-bar add-announcement-specific-top-bar">
+                <div class="back-button add-announcement-back-button" id="add-announcement-back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back</span>
+                </div>
+            </header>
+            <main class="add-announcement-content">
+                <h2 class="add-announcement-title">Tambah Pengumuman</h2>
+                <form id="add-announcement-form">
+                    <div class="input-group">
+                        <label for="announcement-title-input">Judul:</label>
+                        <input type="text" id="announcement-title-input" placeholder="Judul Pengumuman">
+                        <p class="error-message" id="error-announcement-title"></p>
+                    </div>
+                    <div class="input-group">
+                        <label for="announcement-subject-input">Mata Pelajaran:</label>
+                        <input type="text" id="announcement-subject-input" placeholder="Mata Pelajaran">
+                        <p class="error-message" id="error-announcement-subject"></p>
+                    </div>
+                    <div class="input-group">
+                        <label for="announcement-deadline-input">Deadline:</label>
+                        <input type="date" id="announcement-deadline-input">
+                        <p class="error-message" id="error-announcement-deadline"></p>
+                    </div>
+                    <div class="input-group">
+                        <label for="announcement-content-input">Isi:</label>
+                        <textarea id="announcement-content-input" placeholder="Isi Pengumuman"></textarea>
+                        <p class="error-message" id="error-announcement-content"></p>
+                    </div>
+                    <button type="submit" class="publish-button" id="publish-announcement-button">Publish</button>
+                </form>
+            </main>
+        </div>
+
+        <div id="announcement-detail-modal-overlay" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="announcement-detail-modal-title"></h3>
+                    <i class="fas fa-times close-modal-button" id="close-announcement-detail-modal"></i>
+                </div>
+                <div class="modal-body announcement-detail-modal-body">
+                    <p><strong>Mata Pelajaran:</strong> <span id="announcement-detail-subject"></span></p>
+                    <p><strong>Deadline:</strong> <span id="announcement-detail-deadline"></span></p>
+                    <div class="announcement-detail-content" id="announcement-detail-content"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="search-results-modal-overlay hidden" id="search-results-modal-overlay">
+            <div class="search-results-modal-content">
+                <div class="search-results-modal-header">
+                    <h3>Hasil Pencarian Guru</h3>
+                    <i class="fas fa-times close-search-modal-button" id="close-search-modal"></i>
+                </div>
+                <div class="search-results-modal-body">
+                    <div class="search-results-table-container">
+                        <table class="teacher-modal-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama</th>
+                                    <th>Mapel</th>
+                                </tr>
+                            </thead>
+                            <tbody id="search-results-teacher-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="no-search-results-message" class="no-results-message hidden">Tidak ada guru ditemukan.</p>
+                </div>
+            </div>
         </div>
 
 
