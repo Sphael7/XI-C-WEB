@@ -19,12 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const studentView = document.getElementById('student-view');
     const announcementView = document.getElementById('announcement-view');
     const addAnnouncementView = document.getElementById('add-announcement-view');
+    const coverView = document.getElementById('cover-view'); // NEW
 
     const jadwalBox = document.getElementById('jadwal-box');
     const studentBox = document.getElementById('student-box');
     const othersBox = document.getElementById('others-box');
     const teacherBox = document.getElementById('teacher-box');
-    const announcementBox = document.getElementById('announcement-box');
+    const announcementBox = document.getElementById('announcement-main-box'); // UPDATED ID
     const settingsButtonFooter = document.getElementById('settings-button-footer-main');
     const globalHomeButtonFooter = document.getElementById('global-home-button-footer');
 
@@ -99,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addAnnouncementForm = document.getElementById('add-announcement-form');
     const announcementTitleInput = document.getElementById('announcement-title-input');
     const announcementSubjectInput = document.getElementById('announcement-subject-input');
+    const subjectDatalist = document.getElementById('subject-list'); // NEW DATALIST
     const announcementDeadlineInput = document.getElementById('announcement-deadline-input');
     const announcementContentInput = document.getElementById('announcement-content-input');
     const publishAnnouncementButton = document.getElementById('publish-announcement-button');
@@ -114,6 +116,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const announcementDetailContent = document.getElementById('announcement-detail-content');
     const closeAnnouncementDetailModal = document.getElementById('close-announcement-detail-modal');
 
+    // NEW Cover View Elements
+    const coverDateDisplay = document.getElementById('cover-date-display');
+    const coverTimeDisplay = document.getElementById('cover-time-display');
+    const goToHomepageButton = document.getElementById('go-to-homepage-button');
+    const goToSettingsButton = document.getElementById('go-to-settings-button');
+    const goToCreditButton = document.getElementById('go-to-credit-button');
+
 
     let currentUserProfile = {
         nama: "Belum diisi",
@@ -124,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         photo: "https://via.placeholder.com/100"
     };
 
-    let currentActiveView = null;
+    let currentActiveView = null; // Ini akan diinisialisasi ke coverView
 
     const jadwalData = {
         "Senin": [
@@ -375,33 +384,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateJakartaDate() {
         const now = new Date();
-        const options = {
+        const optionsDate = {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
             timeZone: 'Asia/Jakarta'
         };
-        const formattedDate = now.toLocaleDateString('en-US', options);
-        currentDateElement.textContent = `XI-C — ${formattedDate}`;
-    }
-    updateJakartaDate();
-    setInterval(updateJakartaDate, 60 * 1000);
-
-    function updateRealTimeWIB() {
-        const now = new Date();
-        const options = {
+        const optionsTime = {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false,
             timeZone: 'Asia/Jakarta'
         };
-        const formattedTime = now.toLocaleTimeString('en-US', options);
-        if (realTimeWIB) {
+        const formattedDate = now.toLocaleDateString('id-ID', optionsDate); // Use id-ID for Indonesian format
+        const formattedTime = now.toLocaleTimeString('id-ID', optionsTime); // Use id-ID for Indonesian format
+
+        if (currentDateElement) { // For global footer
+            currentDateElement.textContent = `XI-C — ${formattedDate}`;
+        }
+        if (realTimeWIB) { // For Other View's time display
             realTimeWIB.textContent = formattedTime;
         }
+        if (coverDateDisplay) { // For Cover View date
+            coverDateDisplay.textContent = formattedDate;
+        }
+        if (coverTimeDisplay) { // For Cover View time
+            coverTimeDisplay.textContent = formattedTime;
+        }
     }
-    updateRealTimeWIB();
-    setInterval(updateRealTimeWIB, 1000);
+    updateJakartaDate();
+    setInterval(updateJakartaDate, 1000); // Update every second for real-time clock
 
 
     function populateDayDropdown() {
@@ -526,17 +538,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }, ANIMATION_DURATION);
         });
 
-        if (viewToShow === loginView || viewToShow === addAnnouncementView) {
-            globalTopBar.classList.add('login-specific-top-bar');
-            headerSearchSection.style.display = 'none';
-            headerModeToggle.style.display = 'none';
-            globalTopBar.style.justifyContent = 'flex-start';
+        // Toggle top bar elements visibility based on view
+        // Cover view doesn't have the standard top bar
+        if (viewToShow === loginView || viewToShow === addAnnouncementView || viewToShow === coverView) {
+            globalTopBar.classList.add('hidden-view'); // Hide the main top bar
+            // Additional check for login and add_announcement specific top bars
+            if (viewToShow === loginView || viewToShow === addAnnouncementView) {
+                // These views have their own back buttons/headers, so ensure the container is not visible either
+                document.querySelector('.container').classList.add('hidden-view');
+            }
         } else {
-            globalTopBar.classList.remove('login-specific-top-bar');
+            globalTopBar.classList.remove('hidden-view'); // Show the main top bar
+            document.querySelector('.container').classList.remove('hidden-view'); // Ensure container is visible
+            globalTopBar.classList.remove('login-specific-top-bar', 'add-announcement-specific-top-bar'); // Clean up specific top bar styles
             headerSearchSection.style.display = 'flex';
             headerModeToggle.style.display = 'flex';
             globalTopBar.style.justifyContent = 'space-between';
         }
+
 
         toggleDayDropdown(false);
         hideSearchResultsModal(); 
@@ -605,9 +624,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showAddAnnouncementView() {
         showView(addAnnouncementView);
-        // Clear form and errors when entering this view
         addAnnouncementForm.reset();
         clearAnnouncementErrorMessages();
+        populateSubjectDatalist(); // Ensure datalist is populated
     }
 
     function showTeacherModal(subject) {
@@ -818,7 +837,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (announcement) {
             announcementDetailModalTitle.textContent = announcement.judul;
             announcementDetailSubject.textContent = announcement.mapel;
-            announcementDetailDeadline.textContent = announcement.deadline;
+            // Format deadline to a readable date
+            const deadlineDate = new Date(announcement.deadline);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            announcementDetailDeadline.textContent = deadlineDate.toLocaleDateString('id-ID', options);
             announcementDetailContent.textContent = announcement.isi;
 
             announcementDetailModalOverlay.classList.add('visible');
@@ -831,6 +853,15 @@ document.addEventListener('DOMContentLoaded', () => {
         body.style.overflow = '';
     }
 
+    function populateSubjectDatalist() {
+        subjectDatalist.innerHTML = '';
+        subjectDatabase.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            subjectDatalist.appendChild(option);
+        });
+    }
+
     addAnnouncementForm.addEventListener('submit', (event) => {
         event.preventDefault();
         clearAnnouncementErrorMessages();
@@ -839,7 +870,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const title = announcementTitleInput.value.trim();
         const subject = announcementSubjectInput.value.trim();
-        const deadline = announcementDeadlineInput.value; // Date input value is 'YYYY-MM-DD'
+        const deadline = announcementDeadlineInput.value;
         const content = announcementContentInput.value.trim();
 
         if (title === "") {
@@ -874,13 +905,9 @@ document.addEventListener('DOMContentLoaded', () => {
             announcementData.push(newAnnouncement);
             localStorage.setItem('announcementData', JSON.stringify(announcementData));
             
-            // Go back to announcement list and refresh
             showAnnouncementView();
-            // Reset current page to 0 to show the new announcement easily
             currentAnnouncementPage = 0; 
             renderAnnouncementTable(currentAnnouncementPage);
-            // Optionally, show a success message
-            // alert('Pengumuman berhasil dipublikasikan!');
         }
     });
 
@@ -897,6 +924,21 @@ document.addEventListener('DOMContentLoaded', () => {
     globalHomeButtonFooter.addEventListener('click', () => {
         showMainView();
     });
+
+    // Cover View Buttons
+    goToHomepageButton.addEventListener('click', () => {
+        document.querySelector('.container').classList.remove('hidden-view'); // Ensure main content is visible
+        showMainView();
+    });
+    goToSettingsButton.addEventListener('click', () => {
+        document.querySelector('.container').classList.remove('hidden-view'); // Ensure main content is visible
+        showSettingsView();
+    });
+    goToCreditButton.addEventListener('click', () => {
+        alert('Halaman Credit akan segera dibuat!');
+        // showCreditView(); // Implement this later
+    });
+
 
     prevDayArrow.addEventListener('click', () => {
         currentDayIndex = (currentDayIndex - 1 + days.length) % days.length;
@@ -980,5 +1022,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     loadUserProfile();
-    showMainView();
+    populateSubjectDatalist(); // Populate datalist on load
+    showView(coverView); // Start with the Cover view
 });
