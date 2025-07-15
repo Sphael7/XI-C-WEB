@@ -5,11 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Sekolah XI-C</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&family=Shantell+Sans:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body class="dark-mode">
-    <div class="container">
+
+    <div id="cover-view" class="active-view">
+        <header class="cover-top-bar">
+            <span id="cover-date-display" class="cover-date"></span>
+            <span id="cover-time-display" class="cover-time"></span>
+        </header>
+        <main class="cover-content">
+            <h3 class="welcome-text">Welcome!</h3>
+            <h1 class="main-title"><span class="xic">XIC</span><span class="web">WEB</span></h1>
+            <hr class="title-divider">
+            <p class="credit-text">Made by Chris XI-C</p>
+
+            <div class="cover-buttons-container">
+                <button class="cover-button" id="go-to-homepage-button">Go!!</button>
+                <button class="cover-button" id="go-to-settings-button">Settings</button>
+                <button class="cover-button" id="go-to-credit-button">Credit</button>
+            </div>
+        </main>
+        <footer class="cover-footer">
+            <p class="cover-copyright">
+                <i class="far fa-copyright"></i> 2025
+            </p>
+        </footer>
+    </div>
+    
+    <div class="container hidden-view">
         <header class="top-bar" id="global-top-bar">
             <div class="search-section">
                 <i class="fas fa-search search-icon"></i>
@@ -38,7 +63,7 @@
                     <h3>Lainnya</h3>
                     <p>Menu dan fitur tambahan yang relevan.</p>
                 </div>
-                <div class="grid-item item-5" id="announcement-box">
+                <div class="grid-item item-5" id="announcement-main-box">
                     <h3>Pengumuman Penting</h3>
                     <p>Informasi dan pengumuman terbaru.</p>
                 </div>
@@ -262,7 +287,8 @@
                     </div>
                     <div class="input-group">
                         <label for="announcement-subject-input">Mata Pelajaran:</label>
-                        <input type="text" id="announcement-subject-input" placeholder="Mata Pelajaran">
+                        <input type="text" id="announcement-subject-input" list="subject-list" placeholder="Mata Pelajaran">
+                        <datalist id="subject-list"></datalist>
                         <p class="error-message" id="error-announcement-subject"></p>
                     </div>
                     <div class="input-group">
