@@ -24,7 +24,6 @@
 
             <div class="cover-buttons-container">
                 <button class="cover-button" id="go-to-homepage-button">Go!!</button>
-                <button class="cover-button" id="go-to-settings-button">Settings</button>
                 <button class="cover-button" id="go-to-credit-button">Credit</button>
             </div>
         </main>
@@ -64,9 +63,9 @@
                     <h3>Lainnya</h3>
                     <p>Menu dan fitur tambahan yang relevan.</p>
                 </div>
-                <div class="grid-item item-5" id="announcement-main-box">
-                    <h3>Pengumuman Penting</h3>
-                    <p>Informasi dan pengumuman terbaru.</p>
+                <div class="grid-item item-5" id="task-main-box">
+                    <h3>Tugas dan Daftar Tugas</h3>
+                    <p>Informasi tugas dan daftar tugas terbaru.</p>
                 </div>
             </main>
         </div>
@@ -134,7 +133,7 @@
                     <div class="detail-row">
                         <span class="detail-label">NISN:</span>
                         <span class="detail-value" id="profile-nisn">Belum diisi</span>
-                    </div>
+                    -</div>
                     <div class="detail-row">
                         <span class="detail-label">NIS:</span>
                         <span class="detail-value" id="profile-nis">Belum diisi</span>
@@ -251,89 +250,89 @@
             </main>
         </div>
 
-        <div id="announcement-view" class="hidden-view">
-            <main class="announcement-content">
-                <h2 class="announcement-title">Pengumuman</h2>
-                <div class="announcement-table-container">
-                    <table class="announcement-table">
+        <div id="task-view" class="hidden-view">
+            <main class="task-content">
+                <h2 class="task-title">Tugas dan Daftar Tugas</h2>
+                <div class="task-table-container">
+                    <table class="task-table">
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Judul</th>
+                                <th>Judul Tugas</th>
                                 <th>Mata Pelajaran</th>
-                                <th>Isi</th>
+                                <th>Deadline</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="announcement-table-body">
+                        <tbody id="task-table-body">
                             </tbody>
                     </table>
                 </div>
-                <div class="pagination-controls announcement-pagination-controls">
-                    <i class="fas fa-chevron-left pagination-arrow" id="prev-announcement-page"></i>
+                <div class="pagination-controls task-pagination-controls">
+                    <i class="fas fa-chevron-left pagination-arrow" id="prev-task-page"></i>
                     <span class="page-number-display">
-                        Page <span id="current-announcement-page-display">1</span> of <span id="total-announcement-pages-display">1</span>
+                        Page <span id="current-task-page-display">1</span> of <span id="total-task-pages-display">1</span>
                     </span>
-                    <i class="fas fa-chevron-right pagination-arrow" id="next-announcement-page"></i>
+                    <i class="fas fa-chevron-right pagination-arrow" id="next-task-page"></i>
                 </div>
-                <div class="add-announcement-button-container">
-                    <button class="add-announcement-button" id="add-announcement-button">
+                <div class="add-task-button-container">
+                    <button class="add-task-button" id="add-task-button">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
             </main>
         </div>
 
-        <div id="manage-announcement-view" class="hidden-view">
-            <header class="top-bar add-announcement-specific-top-bar">
-                <div class="back-button add-announcement-back-button" id="manage-announcement-back-button">
+        <div id="manage-task-view" class="hidden-view">
+            <header class="top-bar add-task-specific-top-bar">
+                <div class="back-button add-task-back-button" id="manage-task-back-button">
                     <i class="fas fa-arrow-left"></i>
                     <span>Back</span>
                 </div>
             </header>
-            <main class="add-announcement-content">
-                <h2 class="add-announcement-title" id="manage-announcement-title">Tambah Pengumuman</h2>
-                <form id="manage-announcement-form">
-                    <input type="hidden" id="announcement-id-input">
+            <main class="add-task-content">
+                <h2 class="add-task-title" id="manage-task-title">Tambah Tugas</h2>
+                <form id="manage-task-form">
+                    <input type="hidden" id="task-id-input">
                     <div class="input-group">
-                        <label for="announcement-title-input">Judul:</label>
-                        <input type="text" id="announcement-title-input" placeholder="Judul Pengumuman">
-                        <p class="error-message" id="error-announcement-title"></p>
+                        <label for="task-title-input">Judul Tugas:</label>
+                        <input type="text" id="task-title-input" placeholder="Judul Tugas">
+                        <p class="error-message" id="error-task-title"></p>
                     </div>
                     <div class="input-group">
-                        <label for="announcement-subject-input">Mata Pelajaran:</label>
-                        <input type="text" id="announcement-subject-input" list="subject-list" placeholder="Mata Pelajaran">
+                        <label for="task-subject-input">Mata Pelajaran:</label>
+                        <input type="text" id="task-subject-input" list="subject-list" placeholder="Mata Pelajaran">
                         <datalist id="subject-list"></datalist>
-                        <p class="error-message" id="error-announcement-subject"></p>
+                        <p class="error-message" id="error-task-subject"></p>
                     </div>
                     <div class="input-group">
-                        <label for="announcement-deadline-input">Deadline:</label>
-                        <input type="date" id="announcement-deadline-input">
-                        <p class="error-message" id="error-announcement-deadline"></p>
+                        <label for="task-deadline-input">Deadline:</label>
+                        <input type="date" id="task-deadline-input">
+                        <p class="error-message" id="error-task-deadline"></p>
                     </div>
                     <div class="input-group">
-                        <label for="announcement-content-input">Isi:</label>
-                        <textarea id="announcement-content-input" placeholder="Isi Pengumuman"></textarea>
-                        <p class="error-message" id="error-announcement-content"></p>
+                        <label for="task-content-input">Deskripsi Tugas:</label>
+                        <textarea id="task-content-input" placeholder="Isi Deskripsi Tugas"></textarea>
+                        <p class="error-message" id="error-task-content"></p>
                     </div>
-                    <button type="submit" class="publish-button" id="submit-announcement-button">
-                        <span class="button-text">Publish</span>
+                    <button type="submit" class="publish-button" id="submit-task-button">
+                        <span class="button-text">Simpan Tugas</span>
                         <i class="fas fa-spinner fa-spin loading-spinner hidden"></i>
                     </button>
                 </form>
             </main>
         </div>
 
-        <div id="announcement-detail-modal-overlay" class="modal-overlay hidden">
+        <div id="task-detail-modal-overlay" class="modal-overlay hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="announcement-detail-modal-title"></h3>
-                    <i class="fas fa-times close-modal-button" id="close-announcement-detail-modal"></i>
+                    <h3 id="task-detail-modal-title"></h3>
+                    <i class="fas fa-times close-modal-button" id="close-task-detail-modal"></i>
                 </div>
-                <div class="modal-body announcement-detail-modal-body">
-                    <p><strong>Mata Pelajaran:</strong> <span id="announcement-detail-subject"></span></p>
-                    <p><strong>Deadline:</strong> <span id="announcement-detail-deadline"></span></p>
-                    <div class="announcement-detail-content" id="announcement-detail-content"></div>
+                <div class="modal-body task-detail-modal-body">
+                    <p><strong>Mata Pelajaran:</strong> <span id="task-detail-subject"></span></p>
+                    <p><strong>Deadline:</strong> <span id="task-detail-deadline"></span></p>
+                    <div class="task-detail-content" id="task-detail-content"></div>
                 </div>
             </div>
         </div>
@@ -446,8 +445,7 @@
                 <i class="fas fa-times close-modal-button" id="close-delete-confirm-modal"></i>
             </div>
             <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus pengumuman ini?</p>
-                <div class="confirm-buttons">
+                <p>Apakah Anda yakin ingin menghapus tugas ini?</p> <div class="confirm-buttons">
                     <button class="confirm-button cancel-button" id="cancel-delete">Batal</button>
                     <button class="confirm-button delete-button" id="confirm-delete">Hapus</button>
                 </div>
