@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const otherView = document.getElementById('other-view');
     const teacherView = document.getElementById('teacher-view');
     const studentView = document.getElementById('student-view');
-    const announcementView = document.getElementById('announcement-view');
-    const manageAnnouncementView = document.getElementById('manage-announcement-view');
+    const taskView = document.getElementById('task-view'); // Diubah dari announcementView
+    const manageTaskView = document.getElementById('manage-task-view'); // Diubah dari manageAnnouncementView
     const coverView = document.getElementById('cover-view');
     const creditView = document.getElementById('credit-view');
 
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const studentBox = document.getElementById('student-box');
     const othersBox = document.getElementById('others-box');
     const teacherBox = document.getElementById('teacher-box');
-    const announcementBox = document.getElementById('announcement-main-box');
+    const taskBox = document.getElementById('task-main-box'); // Diubah dari announcementBox
     const settingsButtonFooter = document.getElementById('settings-button-footer-main');
     const globalHomeButtonFooter = document.getElementById('global-home-button-footer');
 
@@ -92,39 +92,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentStudentPageDisplay = document.getElementById('current-student-page-display');
     const totalStudentPagesDisplay = document.getElementById('total-student-pages-display');
 
-    const announcementTableBody = document.getElementById('announcement-table-body');
-    const prevAnnouncementPageArrow = document.getElementById('prev-announcement-page');
-    const nextAnnouncementPageArrow = document.getElementById('next-announcement-page');
-    const currentAnnouncementPageDisplay = document.getElementById('current-announcement-page-display');
-    const totalAnnouncementPagesDisplay = document.getElementById('total-announcement-pages-display');
-    const addAnnouncementButton = document.getElementById('add-announcement-button');
+    const taskTableBody = document.getElementById('task-table-body'); // Diubah dari announcementTableBody
+    const prevTaskPageArrow = document.getElementById('prev-task-page'); // Diubah dari prevAnnouncementPageArrow
+    const nextTaskPageArrow = document.getElementById('next-task-page'); // Diubah dari nextAnnouncementPageArrow
+    const currentTaskPageDisplay = document.getElementById('current-task-page-display'); // Diubah dari currentAnnouncementPageDisplay
+    const totalTaskPagesDisplay = document.getElementById('total-task-pages-display'); // Diubah dari totalAnnouncementPagesDisplay
+    const addTaskButton = document.getElementById('add-task-button'); // Diubah dari addAnnouncementButton
 
-    const manageAnnouncementBackButton = document.getElementById('manage-announcement-back-button');
-    const manageAnnouncementTitle = document.getElementById('manage-announcement-title');
-    const manageAnnouncementForm = document.getElementById('manage-announcement-form');
-    const announcementIdInput = document.getElementById('announcement-id-input');
-    const announcementTitleInput = document.getElementById('announcement-title-input');
-    const announcementSubjectInput = document.getElementById('announcement-subject-input');
+    const manageTaskBackButton = document.getElementById('manage-task-back-button'); // Diubah dari manageAnnouncementBackButton
+    const manageTaskTitle = document.getElementById('manage-task-title'); // Diubah dari manageAnnouncementTitle
+    const manageTaskForm = document.getElementById('manage-task-form'); // Diubah dari manageAnnouncementForm
+    const taskIdInput = document.getElementById('task-id-input'); // Diubah dari announcementIdInput
+    const taskTitleInput = document.getElementById('task-title-input'); // Diubah dari announcementTitleInput
+    const taskSubjectInput = document.getElementById('task-subject-input'); // Diubah dari announcementSubjectInput
     const subjectDatalist = document.getElementById('subject-list');
-    const announcementDeadlineInput = document.getElementById('announcement-deadline-input');
-    const announcementContentInput = document.getElementById('announcement-content-input');
-    const submitAnnouncementButton = document.getElementById('submit-announcement-button');
-    const errorAnnouncementTitle = document.getElementById('error-announcement-title');
-    const errorAnnouncementSubject = document.getElementById('error-announcement-subject');
-    const errorAnnouncementDeadline = document.getElementById('error-announcement-deadline');
-    const errorAnnouncementContent = document.getElementById('error-announcement-content');
+    const taskDeadlineInput = document.getElementById('task-deadline-input'); // Diubah dari announcementDeadlineInput
+    const taskContentInput = document.getElementById('task-content-input'); // Diubah dari announcementContentInput
+    const submitTaskButton = document.getElementById('submit-task-button'); // Diubah dari submitAnnouncementButton
+    const errorTaskTitle = document.getElementById('error-task-title'); // Diubah dari errorAnnouncementTitle
+    const errorTaskSubject = document.getElementById('error-task-subject'); // Diubah dari errorAnnouncementSubject
+    const errorTaskDeadline = document.getElementById('error-task-deadline'); // Diubah dari errorAnnouncementDeadline
+    const errorTaskContent = document.getElementById('error-task-content'); // Diubah dari errorAnnouncementContent
 
-    const announcementDetailModalOverlay = document.getElementById('announcement-detail-modal-overlay');
-    const announcementDetailModalTitle = document.getElementById('announcement-detail-modal-title');
-    const announcementDetailSubject = document.getElementById('announcement-detail-subject');
-    const announcementDetailDeadline = document.getElementById('announcement-detail-deadline');
-    const announcementDetailContent = document.getElementById('announcement-detail-content');
-    const closeAnnouncementDetailModal = document.getElementById('close-announcement-detail-modal');
+    const taskDetailModalOverlay = document.getElementById('task-detail-modal-overlay'); // Diubah dari announcementDetailModalOverlay
+    const taskDetailModalTitle = document.getElementById('task-detail-modal-title'); // Diubah dari announcementDetailModalTitle
+    const taskDetailSubject = document.getElementById('task-detail-subject'); // Diubah dari announcementDetailSubject
+    const taskDetailDeadline = document.getElementById('task-detail-deadline'); // Diubah dari announcementDetailDeadline
+    const taskDetailContent = document.getElementById('task-detail-content'); // Diubah dari announcementDetailContent
+    const closeTaskDetailModal = document.getElementById('close-task-detail-modal'); // Diubah dari closeAnnouncementDetailModal
 
     const coverDateDisplay = document.getElementById('cover-date-display');
     const coverTimeDisplay = document.getElementById('cover-time-display');
     const goToHomepageButton = document.getElementById('go-to-homepage-button');
-    const goToSettingsButton = document.getElementById('go-to-settings-button');
+    const goToSettingsButton = document.getElementById('go-to-settings-button'); // Akan dihapus event listener-nya
     const goToCreditButton = document.getElementById('go-to-credit-button');
 
     const creditBackButton = document.getElementById('credit-back-button');
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeDeleteConfirmModal = document.getElementById('close-delete-confirm-modal');
     const cancelDeleteButton = document.getElementById('cancel-delete');
     const confirmDeleteButton = document.getElementById('confirm-delete');
-    let announcementToDeleteId = null;
+    let taskToDeleteId = null; // Diubah dari announcementToDeleteId
 
 
     let currentUserProfile = {
@@ -259,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const subjectNames = Object.keys(groupedTeacherData);
     const itemsPerPage = 6;
     let currentTeacherPage = 0;
-    // totalPages akan dihitung ulang di renderSubjectBoxes jika subjectNames kosong
     let totalPages = Math.ceil(subjectNames.length / itemsPerPage);
 
     const studentData = [
@@ -305,10 +304,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentStudentPage = 0;
     let totalStudentPages = Math.ceil(studentData.length / studentsPerPage);
 
-    let announcementData = JSON.parse(localStorage.getItem('announcementData')) || [];
-    const announcementsPerPage = 7;
-    let currentAnnouncementPage = 0;
-    let totalAnnouncementPages = Math.ceil(announcementData.length / announcementsPerPage);
+    let taskData = JSON.parse(localStorage.getItem('taskData')) || []; // Diubah dari announcementData
+    const tasksPerPage = 7; // Diubah dari announcementsPerPage
+    let currentTaskPage = 0; // Diubah dari currentAnnouncementPage
+    let totalTaskPages = Math.ceil(taskData.length / tasksPerPage); // Diubah dari totalAnnouncementPages
 
     const subjectDatabase = [
         "Fisika", "Kimia", "Agama Islam", "Agama Kristen", "Sejarah", "Matematika Wajib",
@@ -346,12 +345,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         subjectGridContainer.innerHTML = '';
 
-        // Recalculate totalPages if subjectNames changes (e.g., if data is dynamic)
         totalPages = Math.ceil(subjectNames.length / itemsPerPage);
 
         if (subjectsToDisplay.length === 0 && subjectNames.length > 0) {
-            // This case should ideally be handled by ensuring currentTeacherPage is valid
-            // But as a fallback, go to page 0 if somehow current page is out of bounds
             currentTeacherPage = 0;
             renderSubjectBoxes(currentTeacherPage);
             return;
@@ -371,11 +367,9 @@ document.addEventListener('DOMContentLoaded', () => {
             subjectGridContainer.appendChild(subjectBox);
         });
 
-        // Ensure page numbers are correct, even if totalPages is 0
         currentPageDisplay.textContent = page + 1;
         totalPagesDisplay.textContent = totalPages > 0 ? totalPages : 1;
 
-        // Disable/enable pagination arrows
         prevSubjectPageArrow.style.opacity = currentTeacherPage === 0 ? '0.5' : '1';
         prevSubjectPageArrow.style.pointerEvents = currentTeacherPage === 0 ? 'none' : 'auto';
         nextSubjectPageArrow.style.opacity = (currentTeacherPage >= totalPages - 1 && totalPages > 0) ? '0.5' : '1';
@@ -390,7 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
             modeIcon.classList.add('fa-sun');
         }
     } else {
-        // Set default to dark-mode if no preference is saved
         body.classList.add('dark-mode');
     }
 
@@ -473,7 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentDayIndex = parseInt(event.target.dataset.dayIndex);
                 currentDayDisplay.textContent = days[currentDayIndex];
                 displayJadwal(days[currentDayIndex], jadwalSearchInput.value.trim());
-                toggleDayDropdown(false); // Close dropdown after selection
+                toggleDayDropdown(false);
                 updateSelectedDayClass();
             });
             customDayDropdown.appendChild(item);
@@ -550,20 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const ANIMATION_DURATION = 500;
+    const FAST_ANIMATION_DURATION = 200; // Untuk transisi cepat ke homepage
 
-    // Helper to hide all main content views (used during view transitions)
-    function hideAllContentViews() {
-        const allViews = document.querySelectorAll('.container > div[id$="-view"]'); // Select all direct children of .container ending with -view
-        allViews.forEach(view => {
-            if (view.id !== currentActiveView?.id) { // Don't hide the current active view immediately
-                view.classList.remove('active-view');
-                view.classList.add('hidden-view');
-                view.style.pointerEvents = 'none';
-            }
-        });
-    }
-
-    function showView(viewToShow) {
+    function showView(viewToShow, fastTransition = false) {
         if (viewToShow === currentActiveView) {
             return;
         }
@@ -571,24 +553,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const previousView = currentActiveView;
         const mainContainer = document.querySelector('.container');
         const globalBottomBar = document.getElementById('global-bottom-bar');
+        const globalTopBar = document.getElementById('global-top-bar'); // Pastikan ini juga di-deklarasi di sini atau global
 
         // Hide any open modals first
         hideTeacherModal();
         hideSearchResultsModal();
-        hideAnnouncementDetailModal();
+        hideTaskDetailModal();
         hideDeleteConfirmModal();
+
+        const transitionDuration = fastTransition ? FAST_ANIMATION_DURATION : ANIMATION_DURATION;
+
+        // Reset transition property on all views before applying new transitions
+        // This is crucial to prevent "stuck" transitions
+        const allViewsInContainer = document.querySelectorAll('.container > div[id$="-view"]');
+        allViewsInContainer.forEach(view => {
+            view.style.transition = 'none';
+        });
+        if (coverView) coverView.style.transition = 'none';
+        if (creditView) creditView.style.transition = 'none';
+        if (globalBottomBar) globalBottomBar.style.transition = 'none'; // Tambahkan ini
+
 
         // 1. Start exit animation for previous view
         if (previousView) {
             previousView.classList.remove('active-view');
             previousView.classList.add('view-exit');
-            previousView.style.pointerEvents = 'none'; // Disable interactions immediately
+            previousView.style.pointerEvents = 'none';
+            previousView.style.transition = `opacity ${transitionDuration}ms ease-in, transform ${transitionDuration}ms ease-in`;
 
-            // After exit animation, truly hide the previous view
             setTimeout(() => {
                 previousView.classList.remove('view-exit');
                 previousView.classList.add('hidden-view');
-            }, ANIMATION_DURATION);
+                previousView.style.transition = ''; // Reset transition after it's done
+            }, transitionDuration);
         }
 
         // Determine global bar and container visibility based on target view
@@ -596,15 +593,16 @@ document.addEventListener('DOMContentLoaded', () => {
             mainContainer.classList.add('hidden-view');
             globalTopBar.classList.add('hidden-view');
             globalBottomBar.classList.add('hidden-view');
-            viewToShow.style.position = 'fixed'; // Cover/credit take full screen
+            globalBottomBar.style.transition = ''; // Pastikan transisi tidak aktif saat disembunyikan
+            viewToShow.style.position = 'fixed';
         } else {
             mainContainer.classList.remove('hidden-view');
             globalTopBar.classList.remove('hidden-view');
             globalBottomBar.classList.remove('hidden-view');
-            viewToShow.style.position = 'relative'; // Other views are part of main flow
+            globalBottomBar.style.transition = `opacity ${transitionDuration}ms ease-out, transform ${transitionDuration}ms ease-out`; // Terapkan transisi untuk bottom bar
+            viewToShow.style.position = 'relative';
             
             // Explicitly hide mainView if we are going to any other internal view
-            // to prevent flicker, unless mainView is the target itself
             if (viewToShow !== mainView) {
                 mainView.classList.remove('active-view');
                 mainView.classList.add('hidden-view');
@@ -613,78 +611,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // 2. Prepare target view for entry animation
-        viewToShow.classList.remove('hidden-view'); // Ensure it's not display: none
-        viewToShow.classList.add('view-entering'); // Add class to prepare for transition
-        viewToShow.style.pointerEvents = 'auto'; // Enable interactions
+        viewToShow.classList.remove('hidden-view');
+        viewToShow.classList.add('view-entering');
+        viewToShow.style.pointerEvents = 'auto';
+        viewToShow.style.transition = `opacity ${transitionDuration}ms ease-out, transform ${transitionDuration}ms ease-out`;
 
         // 3. Start entry animation for target view
-        requestAnimationFrame(() => { // Use rAF for smooth animation start
+        requestAnimationFrame(() => {
             viewToShow.classList.remove('view-entering');
-            viewToShow.classList.add('active-view'); // This class applies the final transition styles
+            viewToShow.classList.add('active-view');
             currentActiveView = viewToShow;
         });
 
         // Initialize view-specific data/rendering when a view is shown
         if (viewToShow === jadwalView) {
-            const todayReal = new Date().getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
-            if (todayReal >= 1 && todayReal <= 5) { // Monday to Friday
+            const todayReal = new Date().getDay();
+            if (todayReal >= 1 && todayReal <= 5) {
                 currentDayIndex = todayReal - 1;
-            } else { // Weekend, default to Monday
+            } else {
                 currentDayIndex = 0;
             }
             currentDayDisplay.textContent = days[currentDayIndex];
-            jadwalSearchInput.value = ''; // Reset search input
-            displayJadwal(days[currentDayIndex], ''); // Render with no search term
+            jadwalSearchInput.value = '';
+            displayJadwal(days[currentDayIndex], '');
             populateDayDropdown();
-            toggleDayDropdown(false); // Ensure dropdown is closed
+            toggleDayDropdown(false);
         } else if (viewToShow === teacherView) {
-            currentTeacherPage = 0; // Reset to first page
+            currentTeacherPage = 0;
             renderSubjectBoxes(currentTeacherPage);
         } else if (viewToShow === studentView) {
-            currentStudentPage = 0; // Reset to first page
-            studentSearchInput.value = ''; // Reset search input
-            renderStudentTable(currentStudentPage, ''); // Render with no search term
-        } else if (viewToShow === announcementView) {
-            currentAnnouncementPage = 0; // Reset to first page
-            renderAnnouncementTable(currentAnnouncementPage);
+            currentStudentPage = 0;
+            studentSearchInput.value = '';
+            renderStudentTable(currentStudentPage, '');
+        } else if (viewToShow === taskView) { // Changed to taskView
+            currentTaskPage = 0;
+            renderTaskTable(currentTaskPage);
         } else if (viewToShow === profileView) {
-            loadUserProfile(); // Ensure profile data is loaded
+            loadUserProfile();
         } else if (viewToShow === loginView) {
-            clearErrorMessages(); // Clear login form errors
-            // Pre-fill if profile exists, otherwise empty
+            clearErrorMessages();
             inputNama.value = currentUserProfile.nama !== "Belum diisi" ? currentUserProfile.nama : "";
             inputKelas.value = currentUserProfile.kelas !== "Belum diisi" ? currentUserProfile.kelas : "";
             inputAbsen.value = currentUserProfile.absen !== "Belum diisi" ? currentUserProfile.absen : "";
             inputNISN.value = currentUserProfile.nisn !== "Belum diisi" ? currentUserProfile.nisn : "";
             inputNIS.value = currentUserProfile.nis !== "Belum diisi" ? currentUserProfile.nis : "";
-        } else if (viewToShow === manageAnnouncementView) {
-             // Handled by showManageAnnouncementView which calls showView
+        } else if (viewToShow === manageTaskView) {
+             // Handled by showManageTaskView which calls showView
         }
     }
 
-
-    function showMainView() {
-        showView(mainView);
+    function showMainView(fastTransition = false) {
+        showView(mainView, fastTransition);
     }
 
     function showJadwalView() {
         showView(jadwalView);
-        // The logic for initializing jadwalView has been moved inside showView for consistency.
     }
 
     function showSettingsView() {
         showView(settingsView);
-        // The logic for initializing settingsView has been moved inside showView for consistency.
     }
 
     function showProfileView() {
         showView(profileView);
-        // The logic for loading user profile has been moved inside showView for consistency.
     }
 
     function showLoginView() {
         showView(loginView);
-        // The logic for pre-filling and clearing errors has been moved inside showView.
     }
 
     function showOtherView() {
@@ -693,43 +686,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showTeacherView() {
         showView(teacherView);
-        // The logic for rendering subject boxes has been moved inside showView.
     }
 
     function showStudentView() {
         showView(studentView);
-        // The logic for rendering student table has been moved inside showView.
     }
 
-    function showAnnouncementView() {
-        showView(announcementView);
-        // The logic for rendering announcement table has been moved inside showView.
+    function showTaskView() {
+        showView(taskView);
     }
 
-    function showManageAnnouncementView(announcementId = null) {
-        showView(manageAnnouncementView); // First transition the view
-        manageAnnouncementForm.reset();
-        clearAnnouncementErrorMessages();
+    function showManageTaskView(taskId = null) {
+        showView(manageTaskView);
+        manageTaskForm.reset();
+        clearTaskErrorMessages();
         populateSubjectDatalist();
 
-        if (announcementId) {
-            manageAnnouncementTitle.textContent = "Edit Pengumuman";
-            submitAnnouncementButton.querySelector('.button-text').textContent = "Update";
-            const announcement = announcementData.find(ann => ann.id == announcementId);
-            if (announcement) {
-                announcementIdInput.value = announcement.id;
-                announcementTitleInput.value = announcement.judul;
-                announcementSubjectInput.value = announcement.mapel;
-                announcementDeadlineInput.value = announcement.deadline;
-                announcementContentInput.value = announcement.isi;
+        if (taskId) {
+            manageTaskTitle.textContent = "Edit Tugas";
+            submitTaskButton.querySelector('.button-text').textContent = "Update";
+            const task = taskData.find(t => t.id == taskId);
+            if (task) {
+                taskIdInput.value = task.id;
+                taskTitleInput.value = task.judul;
+                taskSubjectInput.value = task.mapel;
+                taskDeadlineInput.value = task.deadline;
+                taskContentInput.value = task.isi;
             }
         } else {
-            manageAnnouncementTitle.textContent = "Tambah Pengumuman";
-            submitAnnouncementButton.querySelector('.button-text').textContent = "Publish";
-            announcementIdInput.value = '';
-            // Set default deadline to today
+            manageTaskTitle.textContent = "Tambah Tugas";
+            submitTaskButton.querySelector('.button-text').textContent = "Simpan Tugas";
+            taskIdInput.value = '';
             const today = new Date().toISOString().split('T')[0];
-            announcementDeadlineInput.value = today;
+            taskDeadlineInput.value = today;
         }
     }
 
@@ -767,11 +756,11 @@ document.addEventListener('DOMContentLoaded', () => {
         clearErrorMessage(errorNIS);
     }
 
-    function clearAnnouncementErrorMessages() {
-        clearErrorMessage(errorAnnouncementTitle);
-        clearErrorMessage(errorAnnouncementSubject);
-        clearErrorMessage(errorAnnouncementDeadline);
-        clearErrorMessage(errorAnnouncementContent);
+    function clearTaskErrorMessages() {
+        clearErrorMessage(errorTaskTitle);
+        clearErrorMessage(errorTaskSubject);
+        clearErrorMessage(errorTaskDeadline);
+        clearErrorMessage(errorTaskContent);
     }
 
     function showSnackbar(message, type = 'info') {
@@ -839,7 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentUserProfile.nisn = nisn;
                 currentUserProfile.nis = nis;
                 saveUserProfile();
-                showProfileView(); // Go back to profile view after successful login
+                showProfileView();
                 showSnackbar('Login berhasil!', 'success');
             } else {
                 showSnackbar('Gagal login. Periksa kembali input Anda.', 'error');
@@ -902,7 +891,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleTeacherSearchDebounced = debounce(function() {
         const searchTerm = headerSearchInput.value.toLowerCase().trim();
-        // Only show modal if there's a search term
         if (searchTerm.length > 0) {
             const filteredTeachers = rawTeacherData.filter(teacher =>
                 teacher.nama.toLowerCase().includes(searchTerm) ||
@@ -960,104 +948,101 @@ document.addEventListener('DOMContentLoaded', () => {
         currentStudentPageDisplay.textContent = page + 1;
         totalStudentPagesDisplay.textContent = totalStudentPages > 0 ? totalStudentPages : 1;
 
-        // Disable/enable student pagination arrows
         prevStudentPageArrow.style.opacity = currentStudentPage === 0 ? '0.5' : '1';
         prevStudentPageArrow.style.pointerEvents = currentStudentPage === 0 ? 'none' : 'auto';
         nextStudentPageArrow.style.opacity = (currentStudentPage >= totalStudentPages - 1 && totalStudentPages > 0) ? '0.5' : '1';
         nextStudentPageArrow.style.pointerEvents = (currentStudentPage >= totalStudentPages - 1 && totalStudentPages > 0) ? 'none' : 'auto';
     }
 
-    function renderAnnouncementTable(page) {
-        // Ensure 'no' property is correct for all announcements
-        announcementData.forEach((ann, index) => {
-            ann.no = index + 1;
+    function renderTaskTable(page) {
+        taskData.forEach((t, index) => {
+            t.no = index + 1;
         });
-        localStorage.setItem('announcementData', JSON.stringify(announcementData)); // Save re-numbered data
+        localStorage.setItem('taskData', JSON.stringify(taskData));
 
-        totalAnnouncementPages = Math.ceil(announcementData.length / announcementsPerPage);
-        if (page >= totalAnnouncementPages && totalAnnouncementPages > 0) {
-            currentAnnouncementPage = totalAnnouncementPages - 1;
-            page = currentAnnouncementPage;
-        } else if (totalAnnouncementPages === 0) {
-            currentAnnouncementPage = 0;
+        totalTaskPages = Math.ceil(taskData.length / tasksPerPage);
+        if (page >= totalTaskPages && totalTaskPages > 0) {
+            currentTaskPage = totalTaskPages - 1;
+            page = currentTaskPage;
+        } else if (totalTaskPages === 0) {
+            currentTaskPage = 0;
             page = 0;
         }
 
-        const start = page * announcementsPerPage;
-        const end = start + announcementsPerPage;
-        const announcementsToDisplay = announcementData.slice(start, end);
+        const start = page * tasksPerPage;
+        const end = start + tasksPerPage;
+        const tasksToDisplay = taskData.slice(start, end);
 
-        announcementTableBody.innerHTML = '';
+        taskTableBody.innerHTML = '';
 
-        if (announcementsToDisplay.length > 0) {
-            announcementsToDisplay.forEach(announcement => {
+        if (tasksToDisplay.length > 0) {
+            tasksToDisplay.forEach(task => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${announcement.no}</td>
-                    <td>${announcement.judul}</td>
-                    <td>${announcement.mapel}</td>
-                    <td><a href="#" class="view-details-link" data-id="${announcement.id}">Lihat selengkapnya</a></td>
+                    <td>${task.no}</td>
+                    <td>${task.judul}</td>
+                    <td>${task.mapel}</td>
+                    <td>${task.deadline}</td>
                     <td class="action-buttons">
-                        <button class="action-button edit-button" data-id="${announcement.id}" title="Edit"><i class="fas fa-edit"></i></button>
-                        <button class="action-button delete-button" data-id="${announcement.id}" title="Hapus"><i class="fas fa-trash"></i></button>
+                        <button class="action-button edit-button" data-id="${task.id}" title="Edit Tugas"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-button" data-id="${task.id}" title="Hapus Tugas"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
-                announcementTableBody.appendChild(row);
+                taskTableBody.appendChild(row);
             });
         } else {
-            announcementTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; opacity: 0.7; padding: 20px;">Belum ada pengumuman.</td></tr>';
+            taskTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; opacity: 0.7; padding: 20px;">Belum ada tugas.</td></tr>';
         }
 
-        currentAnnouncementPageDisplay.textContent = page + 1;
-        totalAnnouncementPagesDisplay.textContent = totalAnnouncementPages > 0 ? totalAnnouncementPages : 1;
+        currentTaskPageDisplay.textContent = page + 1;
+        totalTaskPagesDisplay.textContent = totalTaskPages > 0 ? totalTaskPages : 1;
 
-        // Disable/enable announcement pagination arrows
-        prevAnnouncementPageArrow.style.opacity = currentAnnouncementPage === 0 ? '0.5' : '1';
-        prevAnnouncementPageArrow.style.pointerEvents = currentAnnouncementPage === 0 ? 'none' : 'auto';
-        nextAnnouncementPageArrow.style.opacity = (currentAnnouncementPage >= totalAnnouncementPages - 1 && totalAnnouncementPages > 0) ? '0.5' : '1';
-        nextAnnouncementPageArrow.style.pointerEvents = (currentAnnouncementPage >= totalAnnouncementPages - 1 && totalAnnouncementPages > 0) ? 'none' : 'auto';
+        prevTaskPageArrow.style.opacity = currentTaskPage === 0 ? '0.5' : '1';
+        prevTaskPageArrow.style.pointerEvents = currentTaskPage === 0 ? 'none' : 'auto';
+        nextTaskPageArrow.style.opacity = (currentTaskPage >= totalTaskPages - 1 && totalTaskPages > 0) ? '0.5' : '1';
+        nextTaskPageArrow.style.pointerEvents = (currentTaskPage >= totalTaskPages - 1 && totalTaskPages > 0) ? 'none' : 'auto';
 
 
-        document.querySelectorAll('.view-details-link').forEach(link => {
+        document.querySelectorAll('#task-table-body .view-details-link').forEach(link => {
             link.addEventListener('click', (event) => {
                 event.preventDefault();
-                const announcementId = event.target.dataset.id;
-                showAnnouncementDetailModal(announcementId);
+                const taskId = event.target.dataset.id;
+                showTaskDetailModal(taskId);
             });
         });
 
-        document.querySelectorAll('.edit-button').forEach(button => {
+        document.querySelectorAll('#task-table-body .edit-button').forEach(button => {
             button.addEventListener('click', (event) => {
-                const announcementId = event.currentTarget.dataset.id;
-                showManageAnnouncementView(announcementId);
+                const taskId = event.currentTarget.dataset.id;
+                showManageTaskView(taskId);
             });
         });
 
-        document.querySelectorAll('.delete-button').forEach(button => {
+        document.querySelectorAll('#task-table-body .delete-button').forEach(button => {
             button.addEventListener('click', (event) => {
-                announcementToDeleteId = event.currentTarget.dataset.id;
+                taskToDeleteId = event.currentTarget.dataset.id;
                 showDeleteConfirmModal();
             });
         });
     }
 
-    function showAnnouncementDetailModal(id) {
-        const announcement = announcementData.find(ann => ann.id == id);
-        if (announcement) {
-            announcementDetailModalTitle.textContent = announcement.judul;
-            announcementDetailSubject.textContent = announcement.mapel;
-            const deadlineDate = new Date(announcement.deadline);
+    function showTaskDetailModal(id) {
+        const task = taskData.find(t => t.id == id);
+        if (task) {
+            taskDetailModalTitle.textContent = task.judul;
+            taskDetailSubject.textContent = task.mapel;
+            const deadlineDate = new Date(task.deadline);
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            announcementDetailDeadline.textContent = deadlineDate.toLocaleDateString('id-ID', options);
-            announcementDetailContent.textContent = announcement.isi;
+            taskDetailDeadline.textContent = deadlineDate.toLocaleDateString('id-ID', options);
+            taskDetailContent.textContent = task.isi;
 
-            announcementDetailModalOverlay.classList.add('visible');
+            taskDetailModalOverlay.classList.add('visible');
             body.style.overflow = 'hidden';
         }
     }
 
-    function hideAnnouncementDetailModal() {
-        announcementDetailModalOverlay.classList.remove('visible');
+    function hideTaskDetailModal() {
+        taskDetailModalOverlay.classList.remove('visible');
         body.style.overflow = '';
     }
 
@@ -1070,83 +1055,81 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    manageAnnouncementForm.addEventListener('submit', (event) => {
+    manageTaskForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        clearAnnouncementErrorMessages();
+        clearTaskErrorMessages();
 
-        const submitButtonText = submitAnnouncementButton.querySelector('.button-text');
-        const submitButtonSpinner = submitAnnouncementButton.querySelector('.loading-spinner');
+        const submitButtonText = submitTaskButton.querySelector('.button-text');
+        const submitButtonSpinner = submitTaskButton.querySelector('.loading-spinner');
 
         submitButtonText.classList.add('hidden');
         submitButtonSpinner.classList.remove('hidden');
-        submitAnnouncementButton.disabled = true;
+        submitTaskButton.disabled = true;
 
         setTimeout(() => {
             let isValid = true;
 
-            const id = announcementIdInput.value;
-            const title = announcementTitleInput.value.trim();
-            const subject = announcementSubjectInput.value.trim();
-            const deadline = announcementDeadlineInput.value;
-            const content = announcementContentInput.value.trim();
+            const id = taskIdInput.value;
+            const title = taskTitleInput.value.trim();
+            const subject = taskSubjectInput.value.trim();
+            const deadline = taskDeadlineInput.value;
+            const content = taskContentInput.value.trim();
 
             if (title === "") {
-                displayErrorMessage(errorAnnouncementTitle, "Judul pengumuman tidak boleh kosong.");
+                displayErrorMessage(errorTaskTitle, "Judul tugas tidak boleh kosong.");
                 isValid = false;
             }
             if (subject === "") {
-                displayErrorMessage(errorAnnouncementSubject, "Mata Pelajaran tidak boleh kosong.");
+                displayErrorMessage(errorTaskSubject, "Mata Pelajaran tidak boleh kosong.");
                 isValid = false;
             } else if (!subjectDatabase.includes(subject)) {
-                displayErrorMessage(errorAnnouncementSubject, "Mata Pelajaran tidak valid. Pilih dari daftar yang tersedia.");
+                displayErrorMessage(errorTaskSubject, "Mata Pelajaran tidak valid. Pilih dari daftar yang tersedia.");
                 isValid = false;
             }
             if (deadline === "") {
-                displayErrorMessage(errorAnnouncementDeadline, "Deadline tidak boleh kosong.");
+                displayErrorMessage(errorTaskDeadline, "Deadline tidak boleh kosong.");
                 isValid = false;
             } else {
                 const selectedDate = new Date(deadline);
                 const today = new Date();
-                today.setHours(0, 0, 0, 0); // Normalize today's date
+                today.setHours(0, 0, 0, 0);
                 if (selectedDate < today) {
-                    displayErrorMessage(errorAnnouncementDeadline, "Deadline tidak boleh di tanggal yang sudah lewat.");
+                    displayErrorMessage(errorTaskDeadline, "Deadline tidak boleh di tanggal yang sudah lewat.");
                     isValid = false;
                 }
             }
             if (content === "") {
-                displayErrorMessage(errorAnnouncementContent, "Isi pengumuman tidak boleh kosong.");
+                displayErrorMessage(errorTaskContent, "Isi deskripsi tugas tidak boleh kosong.");
                 isValid = false;
             }
 
             if (isValid) {
                 if (id) {
-                    const index = announcementData.findIndex(ann => ann.id == id);
+                    const index = taskData.findIndex(t => t.id == id);
                     if (index !== -1) {
-                        announcementData[index] = { ...announcementData[index], judul: title, mapel: subject, deadline: deadline, isi: content };
-                        showSnackbar('Pengumuman berhasil diperbarui!', 'success');
+                        taskData[index] = { ...taskData[index], judul: title, mapel: subject, deadline: deadline, isi: content };
+                        showSnackbar('Tugas berhasil diperbarui!', 'success');
                     }
                 } else {
-                    const newAnnouncement = {
-                        id: Date.now(), // Unique ID
-                        // no: announcementData.length + 1, // 'no' will be re-indexed in renderAnnouncementTable
+                    const newTask = {
+                        id: Date.now(),
                         judul: title,
                         mapel: subject,
                         deadline: deadline,
                         isi: content
                     };
-                    announcementData.push(newAnnouncement);
-                    showSnackbar('Pengumuman berhasil dipublikasikan!', 'success');
+                    taskData.push(newTask);
+                    showSnackbar('Tugas berhasil ditambahkan!', 'success');
                 }
-                localStorage.setItem('announcementData', JSON.stringify(announcementData));
-                showAnnouncementView(); // Go back to announcement list and re-render
-                // The re-rendering in showAnnouncementView will handle page reset
+                localStorage.setItem('taskData', JSON.stringify(taskData));
+                showTaskView();
             } else {
-                showSnackbar('Gagal menyimpan pengumuman. Periksa kembali input Anda.', 'error');
+                showSnackbar('Gagal menyimpan tugas. Periksa kembali input Anda.', 'error');
             }
 
             submitButtonText.classList.remove('hidden');
             submitButtonSpinner.classList.add('hidden');
-            submitAnnouncementButton.disabled = false;
+            submitTaskButton.disabled = false;
 
         }, 1000);
     });
@@ -1159,20 +1142,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function hideDeleteConfirmModal() {
         deleteConfirmModalOverlay.classList.remove('visible');
         body.style.overflow = '';
-        announcementToDeleteId = null;
+        taskToDeleteId = null;
     }
 
     confirmDeleteButton.addEventListener('click', () => {
-        if (announcementToDeleteId) {
-            announcementData = announcementData.filter(ann => ann.id != announcementToDeleteId);
-            // Re-index 'no' for all announcements after deletion
-            announcementData.forEach((ann, index) => {
-                ann.no = index + 1;
+        if (taskToDeleteId) {
+            taskData = taskData.filter(t => t.id != taskToDeleteId);
+            taskData.forEach((t, index) => {
+                t.no = index + 1;
             });
-            localStorage.setItem('announcementData', JSON.stringify(announcementData));
+            localStorage.setItem('taskData', JSON.stringify(taskData));
             hideDeleteConfirmModal();
-            showAnnouncementView(); // Go back to announcement list and re-render
-            showSnackbar('Pengumuman berhasil dihapus!', 'success');
+            showTaskView();
+            showSnackbar('Tugas berhasil dihapus!', 'success');
         }
     });
 
@@ -1190,24 +1172,22 @@ document.addEventListener('DOMContentLoaded', () => {
     studentBox.addEventListener('click', showStudentView);
     othersBox.addEventListener('click', showOtherView);
     teacherBox.addEventListener('click', showTeacherView);
-    announcementBox.addEventListener('click', showAnnouncementView);
+    taskBox.addEventListener('click', showTaskView); // Diubah dari announcementBox, showAnnouncementView
     settingsButtonFooter.addEventListener('click', showSettingsView);
     profileSettingsItem.addEventListener('click', showProfileView);
     profileLoginButton.addEventListener('click', showLoginView);
     loginBackButton.addEventListener('click', showProfileView);
 
     globalHomeButtonFooter.addEventListener('click', () => {
-        showMainView();
+        showMainView(true); // Cepat ke homepage dari footer
     });
 
-    // Fix for Settings button on Cover View (direct to Settings)
-    goToSettingsButton.addEventListener('click', () => {
-        showSettingsView();
-    });
+    // Perubahan: Hapus event listener untuk goToSettingsButton jika tidak lagi ada di HTML cover
+    // Jika masih ada di HTML cover, baris ini harus tetap ada
+    // goToSettingsButton.addEventListener('click', () => { showSettingsView(); });
 
-    // Fix for Go Home button on Cover View (direct to Main View)
     goToHomepageButton.addEventListener('click', () => {
-        showMainView();
+        showMainView(); // Dari cover, transisi normal
     });
 
     goToCreditButton.addEventListener('click', () => {
@@ -1219,14 +1199,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     dayDisplayBubble.addEventListener('click', (event) => {
-        // Only toggle if the click is on the bubble itself or its direct children (excluding dropdown items)
         if (event.target === dayDisplayBubble || event.target.closest('.day-display-bubble') === dayDisplayBubble) {
             toggleDayDropdown();
         }
     });
 
     document.addEventListener('click', (event) => {
-        // Close dropdown if click outside
         if (!dayDisplayBubble.contains(event.target) && !customDayDropdown.contains(event.target)) {
             toggleDayDropdown(false);
         }
@@ -1259,7 +1237,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     nextSubjectPageArrow.addEventListener('click', () => {
-        // Ensure totalPages is correctly calculated
         totalPages = Math.ceil(subjectNames.length / itemsPerPage);
         if (currentTeacherPage < totalPages - 1) {
             currentTeacherPage++;
@@ -1276,7 +1253,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     nextStudentPageArrow.addEventListener('click', () => {
-        // Ensure totalStudentPages is correctly calculated based on current filtered data
         const currentFilteredStudents = studentData.filter(student =>
             student.nama.toLowerCase().includes(studentSearchInput.value.toLowerCase().trim()) ||
             String(student.nis).includes(studentSearchInput.value.toLowerCase().trim()) ||
@@ -1291,29 +1267,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     studentSearchInput.addEventListener('input', debounce(function() {
-        currentStudentPage = 0; // Reset to first page on new search
+        currentStudentPage = 0;
         renderStudentTable(currentStudentPage, studentSearchInput.value.trim());
     }, 300));
 
 
-    prevAnnouncementPageArrow.addEventListener('click', () => {
-        if (currentAnnouncementPage > 0) {
-            currentAnnouncementPage--;
-            renderAnnouncementTable(currentAnnouncementPage);
+    prevTaskPageArrow.addEventListener('click', () => {
+        if (currentTaskPage > 0) {
+            currentTaskPage--;
+            renderTaskTable(currentTaskPage);
         }
     });
 
-    nextAnnouncementPageArrow.addEventListener('click', () => {
-        // Ensure totalAnnouncementPages is correctly calculated
-        totalAnnouncementPages = Math.ceil(announcementData.length / announcementsPerPage);
-        if (currentAnnouncementPage < totalAnnouncementPages - 1) {
-            currentAnnouncementPage++;
-            renderAnnouncementTable(currentAnnouncementPage);
+    nextTaskPageArrow.addEventListener('click', () => {
+        totalTaskPages = Math.ceil(taskData.length / tasksPerPage);
+        if (currentTaskPage < totalTaskPages - 1) {
+            currentTaskPage++;
+            renderTaskTable(currentTaskPage);
         }
     });
 
-    addAnnouncementButton.addEventListener('click', () => showManageAnnouncementView(null));
-    manageAnnouncementBackButton.addEventListener('click', showAnnouncementView);
+    addTaskButton.addEventListener('click', () => showManageTaskView(null));
+    manageTaskBackButton.addEventListener('click', showTaskView);
 
     closeTeacherModalButton.addEventListener('click', hideTeacherModal);
     teacherDetailModalOverlay.addEventListener('click', (event) => {
@@ -1322,10 +1297,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    closeAnnouncementDetailModal.addEventListener('click', hideAnnouncementDetailModal);
-    announcementDetailModalOverlay.addEventListener('click', (event) => {
-        if (event.target === announcementDetailModalOverlay) {
-            hideAnnouncementDetailModal();
+    closeTaskDetailModal.addEventListener('click', hideTaskDetailModal);
+    taskDetailModalOverlay.addEventListener('click', (event) => {
+        if (event.target === taskDetailModalOverlay) {
+            hideTaskDetailModal();
         }
     });
 
@@ -1337,8 +1312,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Universal active/focused state for clickable elements and inputs
-    document.querySelectorAll('.grid-item, .settings-item-full, .other-item, .cover-button, .day-nav-arrow, .pagination-arrow, .login-button, .publish-button, .add-announcement-button, .action-button, .confirm-button, .login-specific-top-bar .back-button, .credit-specific-top-bar .back-button').forEach(item => {
+    document.querySelectorAll('.grid-item, .settings-item-full, .other-item, .cover-button, .day-nav-arrow, .pagination-arrow, .login-button, .publish-button, .add-task-button, .action-button, .confirm-button, .login-specific-top-bar .back-button, .credit-specific-top-bar .back-button').forEach(item => {
         item.addEventListener('mousedown', (e) => {
             e.currentTarget.classList.add('active');
         });
@@ -1362,5 +1336,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial setup when DOM is loaded
     loadUserProfile();
     populateSubjectDatalist();
-    showView(coverView); // Start with the cover view
+    showView(coverView);
 });
