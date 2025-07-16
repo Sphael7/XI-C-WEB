@@ -18,14 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const teacherView = document.getElementById('teacher-view');
     const studentView = document.getElementById('student-view');
     const announcementView = document.getElementById('announcement-view');
-    const addAnnouncementView = document.getElementById('add-announcement-view');
-    const coverView = document.getElementById('cover-view'); // NEW
+    const manageAnnouncementView = document.getElementById('manage-announcement-view');
+    const coverView = document.getElementById('cover-view');
+    const creditView = document.getElementById('credit-view');
 
     const jadwalBox = document.getElementById('jadwal-box');
     const studentBox = document.getElementById('student-box');
     const othersBox = document.getElementById('others-box');
     const teacherBox = document.getElementById('teacher-box');
-    const announcementBox = document.getElementById('announcement-main-box'); // UPDATED ID
+    const announcementBox = document.getElementById('announcement-main-box');
     const settingsButtonFooter = document.getElementById('settings-button-footer-main');
     const globalHomeButtonFooter = document.getElementById('global-home-button-footer');
 
@@ -36,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevDayArrow = document.getElementById('prev-day');
     const nextDayArrow = document.getElementById('next-day');
     const jadwalList = document.getElementById('jadwal-list');
+    const jadwalSearchInput = document.getElementById('jadwal-search-input');
     const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
     let currentDayIndex = 0;
 
@@ -63,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorAbsen = document.getElementById('error-absen');
     const errorNISN = document.getElementById('error-nisn');
     const errorNIS = document.getElementById('error-nis');
-
+    const letsGoButtonLogin = document.getElementById('lets-go-button-login');
 
     const realTimeWIB = document.getElementById('real-time-wib');
 
@@ -84,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const noSearchResultsMessage = document.getElementById('no-search-results-message');
 
     const studentTableBody = document.getElementById('student-table-body');
+    const studentSearchInput = document.getElementById('student-search-input');
     const prevStudentPageArrow = document.getElementById('prev-student-page');
     const nextStudentPageArrow = document.getElementById('next-student-page');
     const currentStudentPageDisplay = document.getElementById('current-student-page-display');
@@ -96,14 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalAnnouncementPagesDisplay = document.getElementById('total-announcement-pages-display');
     const addAnnouncementButton = document.getElementById('add-announcement-button');
 
-    const addAnnouncementBackButton = document.getElementById('add-announcement-back-button');
-    const addAnnouncementForm = document.getElementById('add-announcement-form');
+    const manageAnnouncementBackButton = document.getElementById('manage-announcement-back-button');
+    const manageAnnouncementTitle = document.getElementById('manage-announcement-title');
+    const manageAnnouncementForm = document.getElementById('manage-announcement-form');
+    const announcementIdInput = document.getElementById('announcement-id-input');
     const announcementTitleInput = document.getElementById('announcement-title-input');
     const announcementSubjectInput = document.getElementById('announcement-subject-input');
-    const subjectDatalist = document.getElementById('subject-list'); // NEW DATALIST
+    const subjectDatalist = document.getElementById('subject-list');
     const announcementDeadlineInput = document.getElementById('announcement-deadline-input');
     const announcementContentInput = document.getElementById('announcement-content-input');
-    const publishAnnouncementButton = document.getElementById('publish-announcement-button');
+    const submitAnnouncementButton = document.getElementById('submit-announcement-button');
     const errorAnnouncementTitle = document.getElementById('error-announcement-title');
     const errorAnnouncementSubject = document.getElementById('error-announcement-subject');
     const errorAnnouncementDeadline = document.getElementById('error-announcement-deadline');
@@ -116,12 +121,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const announcementDetailContent = document.getElementById('announcement-detail-content');
     const closeAnnouncementDetailModal = document.getElementById('close-announcement-detail-modal');
 
-    // NEW Cover View Elements
     const coverDateDisplay = document.getElementById('cover-date-display');
     const coverTimeDisplay = document.getElementById('cover-time-display');
     const goToHomepageButton = document.getElementById('go-to-homepage-button');
     const goToSettingsButton = document.getElementById('go-to-settings-button');
     const goToCreditButton = document.getElementById('go-to-credit-button');
+
+    const creditBackButton = document.getElementById('credit-back-button');
+
+    const snackbar = document.getElementById('snackbar');
+
+    const deleteConfirmModalOverlay = document.getElementById('delete-confirm-modal-overlay');
+    const closeDeleteConfirmModal = document.getElementById('close-delete-confirm-modal');
+    const cancelDeleteButton = document.getElementById('cancel-delete');
+    const confirmDeleteButton = document.getElementById('confirm-delete');
+    let announcementToDeleteId = null;
 
 
     let currentUserProfile = {
@@ -133,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         photo: "https://via.placeholder.com/100"
     };
 
-    let currentActiveView = null; // Ini akan diinisialisasi ke coverView
+    let currentActiveView = null; // Track the currently active view element
 
     const jadwalData = {
         "Senin": [
@@ -245,7 +259,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const subjectNames = Object.keys(groupedTeacherData);
     const itemsPerPage = 6;
     let currentTeacherPage = 0;
-    const totalPages = Math.ceil(subjectNames.length / itemsPerPage);
+    // totalPages akan dihitung ulang di renderSubjectBoxes jika subjectNames kosong
+    let totalPages = Math.ceil(subjectNames.length / itemsPerPage);
 
     const studentData = [
         { no: 1, nis: 27963, nisn: "0093214922", nama: "Anjani Raisya Nabila" },
@@ -288,17 +303,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const studentsPerPage = 9;
     let currentStudentPage = 0;
-    const totalStudentPages = Math.ceil(studentData.length / studentsPerPage);
+    let totalStudentPages = Math.ceil(studentData.length / studentsPerPage);
 
-    let announcementData = JSON.parse(localStorage.getItem('announcementData')) || []; 
+    let announcementData = JSON.parse(localStorage.getItem('announcementData')) || [];
     const announcementsPerPage = 7;
     let currentAnnouncementPage = 0;
     let totalAnnouncementPages = Math.ceil(announcementData.length / announcementsPerPage);
 
     const subjectDatabase = [
-        "Fisika", "Kimia", "Agama Islam", "Agama Kristen", "Sejarah", "Matematika Wajib", 
-        "Matematika Lanjut", "Bahasa Inggris", "Bahasa Indonesia", "Informatika", "PPKn", 
-        "Seni Budaya", "PKWU", "PJOK", "BK"
+        "Fisika", "Kimia", "Agama Islam", "Agama Kristen", "Sejarah", "Matematika Wajib",
+        "Matematika Lanjut", "Bahasa Inggris", "Bahasa Indonesia", "Informatika", "PPKn",
+        "Seni Budaya", "PKWU", "PJOK", "BK", "PEND. AGAMA", "EKONOMI", "SOSIOLOGI", "GEOGRAFI", "BAHASA JERMAN", "BIMBINGAN KONSELING"
     ];
 
     function populateTeacherTable(tableBodyElement, teachers) {
@@ -331,7 +346,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         subjectGridContainer.innerHTML = '';
 
+        // Recalculate totalPages if subjectNames changes (e.g., if data is dynamic)
+        totalPages = Math.ceil(subjectNames.length / itemsPerPage);
+
         if (subjectsToDisplay.length === 0 && subjectNames.length > 0) {
+            // This case should ideally be handled by ensuring currentTeacherPage is valid
+            // But as a fallback, go to page 0 if somehow current page is out of bounds
             currentTeacherPage = 0;
             renderSubjectBoxes(currentTeacherPage);
             return;
@@ -351,8 +371,15 @@ document.addEventListener('DOMContentLoaded', () => {
             subjectGridContainer.appendChild(subjectBox);
         });
 
+        // Ensure page numbers are correct, even if totalPages is 0
         currentPageDisplay.textContent = page + 1;
         totalPagesDisplay.textContent = totalPages > 0 ? totalPages : 1;
+
+        // Disable/enable pagination arrows
+        prevSubjectPageArrow.style.opacity = currentTeacherPage === 0 ? '0.5' : '1';
+        prevSubjectPageArrow.style.pointerEvents = currentTeacherPage === 0 ? 'none' : 'auto';
+        nextSubjectPageArrow.style.opacity = (currentTeacherPage >= totalPages - 1 && totalPages > 0) ? '0.5' : '1';
+        nextSubjectPageArrow.style.pointerEvents = (currentTeacherPage >= totalPages - 1 && totalPages > 0) ? 'none' : 'auto';
     }
 
     const savedMode = localStorage.getItem('theme');
@@ -363,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modeIcon.classList.add('fa-sun');
         }
     } else {
+        // Set default to dark-mode if no preference is saved
         body.classList.add('dark-mode');
     }
 
@@ -396,25 +424,39 @@ document.addEventListener('DOMContentLoaded', () => {
             hour12: false,
             timeZone: 'Asia/Jakarta'
         };
-        const formattedDate = now.toLocaleDateString('id-ID', optionsDate); // Use id-ID for Indonesian format
-        const formattedTime = now.toLocaleTimeString('id-ID', optionsTime); // Use id-ID for Indonesian format
+        const formattedDate = now.toLocaleDateString('id-ID', optionsDate);
+        const formattedTime = now.toLocaleTimeString('id-ID', optionsTime);
 
-        if (currentDateElement) { // For global footer
+        if (currentDateElement) {
             currentDateElement.textContent = `XI-C — ${formattedDate}`;
         }
-        if (realTimeWIB) { // For Other View's time display
+        if (realTimeWIB) {
             realTimeWIB.textContent = formattedTime;
         }
-        if (coverDateDisplay) { // For Cover View date
+        if (coverDateDisplay) {
             coverDateDisplay.textContent = formattedDate;
         }
-        if (coverTimeDisplay) { // For Cover View time
+        if (coverTimeDisplay) {
             coverTimeDisplay.textContent = formattedTime;
         }
     }
     updateJakartaDate();
-    setInterval(updateJakartaDate, 1000); // Update every second for real-time clock
+    setInterval(updateJakartaDate, 1000);
 
+    function toggleDayDropdown(show) {
+        if (typeof show === 'boolean') {
+            if (show) {
+                customDayDropdown.classList.add('show');
+                dayDisplayBubble.classList.add('open');
+            } else {
+                customDayDropdown.classList.remove('show');
+                dayDisplayBubble.classList.remove('open');
+            }
+        } else {
+            customDayDropdown.classList.toggle('show');
+            dayDisplayBubble.classList.toggle('open');
+        }
+    }
 
     function populateDayDropdown() {
         customDayDropdown.innerHTML = '';
@@ -430,8 +472,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.stopPropagation();
                 currentDayIndex = parseInt(event.target.dataset.dayIndex);
                 currentDayDisplay.textContent = days[currentDayIndex];
-                displayJadwal(days[currentDayIndex]);
-                toggleDayDropdown(false);
+                displayJadwal(days[currentDayIndex], jadwalSearchInput.value.trim());
+                toggleDayDropdown(false); // Close dropdown after selection
                 updateSelectedDayClass();
             });
             customDayDropdown.appendChild(item);
@@ -448,11 +490,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function displayJadwal(day) {
+    function displayJadwal(day, searchTerm = '') {
         jadwalList.innerHTML = '';
         const jadwalToday = jadwalData[day];
-        if (jadwalToday && jadwalToday.length > 0) {
-            jadwalToday.forEach(item => {
+        let filteredJadwal = jadwalToday;
+
+        if (searchTerm) {
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+            filteredJadwal = jadwalToday.filter(item =>
+                item.mapel.toLowerCase().includes(lowerCaseSearchTerm) ||
+                item.guru.toLowerCase().includes(lowerCaseSearchTerm)
+            );
+        }
+
+        if (filteredJadwal && filteredJadwal.length > 0) {
+            filteredJadwal.forEach(item => {
                 const jadwalItemDiv = document.createElement('div');
                 jadwalItemDiv.classList.add('jadwal-item');
                 jadwalItemDiv.innerHTML = `
@@ -460,28 +512,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="mapel">${item.mapel}</div>
                     <div class="guru">${item.guru}</div>
                 `;
+                jadwalItemDiv.style.opacity = '0';
+                jadwalItemDiv.style.transform = 'translateY(20px)';
                 jadwalList.appendChild(jadwalItemDiv);
+
+                setTimeout(() => {
+                    jadwalItemDiv.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                    jadwalItemDiv.style.opacity = '1';
+                    jadwalItemDiv.style.transform = 'translateY(0)';
+                }, 50);
             });
         } else {
-            jadwalList.innerHTML = '<p style="text-align: center; opacity: 0.7;">Jadwal tidak tersedia untuk hari ini.</p>';
+            jadwalList.innerHTML = '<p style="text-align: center; opacity: 0.7;">Tidak ada jadwal atau tidak ditemukan untuk pencarian ini.</p>';
         }
-    }
-
-    function toggleDayDropdown(show) {
-        if (show === true) {
-            dayDisplayBubble.classList.add('open');
-            customDayDropdown.classList.add('show');
-            dropdownArrow.classList.add('rotated');
-        } else if (show === false) {
-            dayDisplayBubble.classList.remove('open');
-            customDayDropdown.classList.remove('show');
-            dropdownArrow.classList.remove('rotated');
-        } else {
-            dayDisplayBubble.classList.toggle('open');
-            customDayDropdown.classList.toggle('show');
-            dropdownArrow.classList.toggle('rotated');
-        }
-        updateSelectedDayClass();
     }
 
     function loadUserProfile() {
@@ -506,7 +549,19 @@ document.addEventListener('DOMContentLoaded', () => {
         profilePhoto.src = currentUserProfile.photo || "https://via.placeholder.com/100";
     }
 
-    const ANIMATION_DURATION = 300;
+    const ANIMATION_DURATION = 500;
+
+    // Helper to hide all main content views (used during view transitions)
+    function hideAllContentViews() {
+        const allViews = document.querySelectorAll('.container > div[id$="-view"]'); // Select all direct children of .container ending with -view
+        allViews.forEach(view => {
+            if (view.id !== currentActiveView?.id) { // Don't hide the current active view immediately
+                view.classList.remove('active-view');
+                view.classList.add('hidden-view');
+                view.style.pointerEvents = 'none';
+            }
+        });
+    }
 
     function showView(viewToShow) {
         if (viewToShow === currentActiveView) {
@@ -514,58 +569,96 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const previousView = currentActiveView;
+        const mainContainer = document.querySelector('.container');
+        const globalBottomBar = document.getElementById('global-bottom-bar');
 
+        // Hide any open modals first
+        hideTeacherModal();
+        hideSearchResultsModal();
+        hideAnnouncementDetailModal();
+        hideDeleteConfirmModal();
+
+        // 1. Start exit animation for previous view
         if (previousView) {
+            previousView.classList.remove('active-view');
             previousView.classList.add('view-exit');
+            previousView.style.pointerEvents = 'none'; // Disable interactions immediately
+
+            // After exit animation, truly hide the previous view
             setTimeout(() => {
-                previousView.classList.remove('active-view', 'view-exit');
+                previousView.classList.remove('view-exit');
                 previousView.classList.add('hidden-view');
-                previousView.style.pointerEvents = 'none'; 
             }, ANIMATION_DURATION);
         }
 
-        viewToShow.classList.remove('hidden-view');
-        viewToShow.classList.add('view-enter');
-        viewToShow.style.pointerEvents = 'auto';
+        // Determine global bar and container visibility based on target view
+        if (viewToShow === coverView || viewToShow === creditView) {
+            mainContainer.classList.add('hidden-view');
+            globalTopBar.classList.add('hidden-view');
+            globalBottomBar.classList.add('hidden-view');
+            viewToShow.style.position = 'fixed'; // Cover/credit take full screen
+        } else {
+            mainContainer.classList.remove('hidden-view');
+            globalTopBar.classList.remove('hidden-view');
+            globalBottomBar.classList.remove('hidden-view');
+            viewToShow.style.position = 'relative'; // Other views are part of main flow
+            
+            // Explicitly hide mainView if we are going to any other internal view
+            // to prevent flicker, unless mainView is the target itself
+            if (viewToShow !== mainView) {
+                mainView.classList.remove('active-view');
+                mainView.classList.add('hidden-view');
+                mainView.style.pointerEvents = 'none';
+            }
+        }
+        
+        // 2. Prepare target view for entry animation
+        viewToShow.classList.remove('hidden-view'); // Ensure it's not display: none
+        viewToShow.classList.add('view-entering'); // Add class to prepare for transition
+        viewToShow.style.pointerEvents = 'auto'; // Enable interactions
 
-        requestAnimationFrame(() => {
-            viewToShow.classList.remove('view-enter');
-            viewToShow.classList.add('active-view', 'view-enter-active');
+        // 3. Start entry animation for target view
+        requestAnimationFrame(() => { // Use rAF for smooth animation start
+            viewToShow.classList.remove('view-entering');
+            viewToShow.classList.add('active-view'); // This class applies the final transition styles
             currentActiveView = viewToShow;
-
-            setTimeout(() => {
-                viewToShow.classList.remove('view-enter-active');
-            }, ANIMATION_DURATION);
         });
 
-        // Toggle top bar elements visibility based on view
-        // Cover view doesn't have the standard top bar
-        if (viewToShow === loginView || viewToShow === addAnnouncementView || viewToShow === coverView) {
-            globalTopBar.classList.add('hidden-view'); // Hide the main top bar
-            // Additional check for login and add_announcement specific top bars
-            if (viewToShow === loginView || viewToShow === addAnnouncementView) {
-                // These views have their own back buttons/headers, so ensure the container is not visible either
-                document.querySelector('.container').classList.add('hidden-view');
+        // Initialize view-specific data/rendering when a view is shown
+        if (viewToShow === jadwalView) {
+            const todayReal = new Date().getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+            if (todayReal >= 1 && todayReal <= 5) { // Monday to Friday
+                currentDayIndex = todayReal - 1;
+            } else { // Weekend, default to Monday
+                currentDayIndex = 0;
             }
-        } else {
-            globalTopBar.classList.remove('hidden-view'); // Show the main top bar
-            document.querySelector('.container').classList.remove('hidden-view'); // Ensure container is visible
-            globalTopBar.classList.remove('login-specific-top-bar', 'add-announcement-specific-top-bar'); // Clean up specific top bar styles
-            headerSearchSection.style.display = 'flex';
-            headerModeToggle.style.display = 'flex';
-            globalTopBar.style.justifyContent = 'space-between';
-        }
-
-
-        toggleDayDropdown(false);
-        hideSearchResultsModal(); 
-
-        if (viewToShow === teacherView) {
+            currentDayDisplay.textContent = days[currentDayIndex];
+            jadwalSearchInput.value = ''; // Reset search input
+            displayJadwal(days[currentDayIndex], ''); // Render with no search term
+            populateDayDropdown();
+            toggleDayDropdown(false); // Ensure dropdown is closed
+        } else if (viewToShow === teacherView) {
+            currentTeacherPage = 0; // Reset to first page
             renderSubjectBoxes(currentTeacherPage);
         } else if (viewToShow === studentView) {
-            renderStudentTable(currentStudentPage);
+            currentStudentPage = 0; // Reset to first page
+            studentSearchInput.value = ''; // Reset search input
+            renderStudentTable(currentStudentPage, ''); // Render with no search term
         } else if (viewToShow === announcementView) {
+            currentAnnouncementPage = 0; // Reset to first page
             renderAnnouncementTable(currentAnnouncementPage);
+        } else if (viewToShow === profileView) {
+            loadUserProfile(); // Ensure profile data is loaded
+        } else if (viewToShow === loginView) {
+            clearErrorMessages(); // Clear login form errors
+            // Pre-fill if profile exists, otherwise empty
+            inputNama.value = currentUserProfile.nama !== "Belum diisi" ? currentUserProfile.nama : "";
+            inputKelas.value = currentUserProfile.kelas !== "Belum diisi" ? currentUserProfile.kelas : "";
+            inputAbsen.value = currentUserProfile.absen !== "Belum diisi" ? currentUserProfile.absen : "";
+            inputNISN.value = currentUserProfile.nisn !== "Belum diisi" ? currentUserProfile.nisn : "";
+            inputNIS.value = currentUserProfile.nis !== "Belum diisi" ? currentUserProfile.nis : "";
+        } else if (viewToShow === manageAnnouncementView) {
+             // Handled by showManageAnnouncementView which calls showView
         }
     }
 
@@ -576,34 +669,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showJadwalView() {
         showView(jadwalView);
-        const todayReal = new Date().getDay();
-        if (todayReal >= 1 && todayReal <= 5) {
-            currentDayIndex = todayReal - 1;
-        } else {
-            currentDayIndex = 0;
-        }
-        currentDayDisplay.textContent = days[currentDayIndex];
-        displayJadwal(days[currentDayIndex]);
-        populateDayDropdown();
+        // The logic for initializing jadwalView has been moved inside showView for consistency.
     }
 
     function showSettingsView() {
         showView(settingsView);
+        // The logic for initializing settingsView has been moved inside showView for consistency.
     }
 
     function showProfileView() {
         showView(profileView);
-        loadUserProfile();
+        // The logic for loading user profile has been moved inside showView for consistency.
     }
 
     function showLoginView() {
         showView(loginView);
-        inputNama.value = currentUserProfile.nama !== "Belum diisi" ? currentUserProfile.nama : "";
-        inputKelas.value = currentUserProfile.kelas !== "Belum diisi" ? currentUserProfile.kelas : "";
-        inputAbsen.value = currentUserProfile.absen !== "Belum diisi" ? currentUserProfile.absen : "";
-        inputNISN.value = currentUserProfile.nisn !== "Belum diisi" ? currentUserProfile.nisn : "";
-        inputNIS.value = currentUserProfile.nis !== "Belum diisi" ? currentUserProfile.nis : "";
-        clearErrorMessages();
+        // The logic for pre-filling and clearing errors has been moved inside showView.
     }
 
     function showOtherView() {
@@ -612,21 +693,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showTeacherView() {
         showView(teacherView);
+        // The logic for rendering subject boxes has been moved inside showView.
     }
 
     function showStudentView() {
         showView(studentView);
+        // The logic for rendering student table has been moved inside showView.
     }
 
     function showAnnouncementView() {
         showView(announcementView);
+        // The logic for rendering announcement table has been moved inside showView.
     }
 
-    function showAddAnnouncementView() {
-        showView(addAnnouncementView);
-        addAnnouncementForm.reset();
+    function showManageAnnouncementView(announcementId = null) {
+        showView(manageAnnouncementView); // First transition the view
+        manageAnnouncementForm.reset();
         clearAnnouncementErrorMessages();
-        populateSubjectDatalist(); // Ensure datalist is populated
+        populateSubjectDatalist();
+
+        if (announcementId) {
+            manageAnnouncementTitle.textContent = "Edit Pengumuman";
+            submitAnnouncementButton.querySelector('.button-text').textContent = "Update";
+            const announcement = announcementData.find(ann => ann.id == announcementId);
+            if (announcement) {
+                announcementIdInput.value = announcement.id;
+                announcementTitleInput.value = announcement.judul;
+                announcementSubjectInput.value = announcement.mapel;
+                announcementDeadlineInput.value = announcement.deadline;
+                announcementContentInput.value = announcement.isi;
+            }
+        } else {
+            manageAnnouncementTitle.textContent = "Tambah Pengumuman";
+            submitAnnouncementButton.querySelector('.button-text').textContent = "Publish";
+            announcementIdInput.value = '';
+            // Set default deadline to today
+            const today = new Date().toISOString().split('T')[0];
+            announcementDeadlineInput.value = today;
+        }
+    }
+
+    function showCreditView() {
+        showView(creditView);
     }
 
     function showTeacherModal(subject) {
@@ -666,48 +774,82 @@ document.addEventListener('DOMContentLoaded', () => {
         clearErrorMessage(errorAnnouncementContent);
     }
 
+    function showSnackbar(message, type = 'info') {
+        snackbar.textContent = message;
+        snackbar.className = `snackbar show ${type}`;
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace('show', '').replace(type, '');
+        }, 3000);
+    }
+
+    let debounceTimer;
+    function debounce(func, delay) {
+        return function(...args) {
+            const context = this;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(context, args), delay);
+        };
+    }
+
     loginForm.addEventListener('submit', (event) => {
         event.preventDefault();
         clearErrorMessages();
 
-        let isValid = true;
+        const submitButtonText = letsGoButtonLogin.querySelector('.button-text');
+        const submitButtonSpinner = letsGoButtonLogin.querySelector('.loading-spinner');
 
-        const nama = inputNama.value.trim();
-        const kelas = inputKelas.value.trim();
-        const absen = inputAbsen.value.trim();
-        const nisn = inputNISN.value.trim();
-        const nis = inputNIS.value.trim();
+        submitButtonText.classList.add('hidden');
+        submitButtonSpinner.classList.remove('hidden');
+        letsGoButtonLogin.disabled = true;
 
-        if (nama === "") {
-            displayErrorMessage(errorNama, "Nama tidak boleh kosong.");
-            isValid = false;
-        }
-        if (kelas === "") {
-            displayErrorMessage(errorKelas, "Kelas tidak boleh kosong.");
-            isValid = false;
-        }
-        if (absen === "" || isNaN(absen) || parseInt(absen) <= 0) {
-            displayErrorMessage(errorAbsen, "No. Absen harus angka positif.");
-            isValid = false;
-        }
-        if (nisn === "" || isNaN(nisn) || parseInt(nisn) <= 0) {
-            displayErrorMessage(errorNISN, "NISN harus angka positif.");
-            isValid = false;
-        }
-        if (nis === "" || isNaN(nis) || parseInt(nis) <= 0) {
-            displayErrorMessage(errorNIS, "NIS harus angka positif.");
-            isValid = false;
-        }
+        setTimeout(() => {
+            let isValid = true;
 
-        if (isValid) {
-            currentUserProfile.nama = nama;
-            currentUserProfile.kelas = kelas;
-            currentUserProfile.absen = absen;
-            currentUserProfile.nisn = nisn;
-            currentUserProfile.nis = nis;
-            saveUserProfile();
-            showProfileView();
-        }
+            const nama = inputNama.value.trim();
+            const kelas = inputKelas.value.trim();
+            const absen = inputAbsen.value.trim();
+            const nisn = inputNISN.value.trim();
+            const nis = inputNIS.value.trim();
+
+            if (nama === "") {
+                displayErrorMessage(errorNama, "Nama tidak boleh kosong.");
+                isValid = false;
+            }
+            if (kelas === "") {
+                displayErrorMessage(errorKelas, "Kelas tidak boleh kosong.");
+                isValid = false;
+            }
+            if (absen === "" || isNaN(absen) || parseInt(absen) <= 0) {
+                displayErrorMessage(errorAbsen, "No. Absen harus angka positif.");
+                isValid = false;
+            }
+            if (nisn === "" || isNaN(nisn) || parseInt(nisn) <= 0) {
+                displayErrorMessage(errorNISN, "NISN harus angka positif.");
+                isValid = false;
+            }
+            if (nis === "" || isNaN(nis) || parseInt(nis) <= 0) {
+                displayErrorMessage(errorNIS, "NIS harus angka positif.");
+                isValid = false;
+            }
+
+            if (isValid) {
+                currentUserProfile.nama = nama;
+                currentUserProfile.kelas = kelas;
+                currentUserProfile.absen = absen;
+                currentUserProfile.nisn = nisn;
+                currentUserProfile.nis = nis;
+                saveUserProfile();
+                showProfileView(); // Go back to profile view after successful login
+                showSnackbar('Login berhasil!', 'success');
+            } else {
+                showSnackbar('Gagal login. Periksa kembali input Anda.', 'error');
+            }
+
+            submitButtonText.classList.remove('hidden');
+            submitButtonSpinner.classList.add('hidden');
+            letsGoButtonLogin.disabled = false;
+
+        }, 1000);
     });
 
     uploadPhotoIcon.addEventListener('click', () => {
@@ -718,13 +860,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const file = event.target.files[0];
         if (file) {
             if (!file.type.startsWith('image/')) {
-                alert('File yang dipilih bukan gambar. Harap pilih file gambar.');
+                showSnackbar('File yang dipilih bukan gambar. Harap pilih file gambar.', 'error');
                 profilePhotoUpload.value = '';
                 return;
             }
             const MAX_FILE_SIZE = 2 * 1024 * 1024;
             if (file.size > MAX_FILE_SIZE) {
-                alert('Ukuran gambar terlalu besar. Maksimum 2MB.');
+                showSnackbar('Ukuran gambar terlalu besar. Maksimum 2MB.', 'error');
                 profilePhotoUpload.value = '';
                 return;
             }
@@ -733,9 +875,10 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (e) => {
                 currentUserProfile.photo = e.target.result;
                 saveUserProfile();
+                showSnackbar('Foto profil berhasil diunggah!', 'success');
             };
             reader.onerror = () => {
-                alert('Gagal membaca file gambar. Coba lagi.');
+                showSnackbar('Gagal membaca file gambar. Coba lagi.', 'error');
                 profilePhotoUpload.value = '';
             };
             reader.readAsDataURL(file);
@@ -743,12 +886,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function showSearchResultsModal() {
-        body.style.overflow = 'hidden'; 
-        searchResultsModalOverlay.classList.add('visible'); 
+        body.style.overflow = 'hidden';
+        searchResultsModalOverlay.classList.add('visible');
     }
 
     function hideSearchResultsModal() {
-        searchResultsModalOverlay.classList.remove('visible'); 
+        searchResultsModalOverlay.classList.remove('visible');
         setTimeout(() => {
             body.style.overflow = '';
             searchResultsTeacherTableBody.innerHTML = '';
@@ -757,24 +900,45 @@ document.addEventListener('DOMContentLoaded', () => {
         headerSearchInput.value = '';
     }
 
-    function handleSearch() {
+    const handleTeacherSearchDebounced = debounce(function() {
         const searchTerm = headerSearchInput.value.toLowerCase().trim();
-
+        // Only show modal if there's a search term
         if (searchTerm.length > 0) {
             const filteredTeachers = rawTeacherData.filter(teacher =>
-                teacher.nama.toLowerCase().includes(searchTerm)
+                teacher.nama.toLowerCase().includes(searchTerm) ||
+                teacher.mapel.toLowerCase().includes(searchTerm) ||
+                teacher.kode.toLowerCase().includes(searchTerm)
             );
             populateTeacherTable(searchResultsTeacherTableBody, filteredTeachers);
             showSearchResultsModal();
         } else {
             hideSearchResultsModal();
         }
-    }
+    }, 300);
 
-    function renderStudentTable(page) {
+    function renderStudentTable(page, searchTerm = '') {
+        let filteredStudents = studentData;
+        if (searchTerm) {
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+            filteredStudents = studentData.filter(student =>
+                student.nama.toLowerCase().includes(lowerCaseSearchTerm) ||
+                String(student.nis).includes(lowerCaseSearchTerm) ||
+                String(student.nisn).includes(lowerCaseSearchTerm)
+            );
+        }
+
+        totalStudentPages = Math.ceil(filteredStudents.length / studentsPerPage);
+        if (page >= totalStudentPages && totalStudentPages > 0) {
+            currentStudentPage = totalStudentPages - 1;
+            page = currentStudentPage;
+        } else if (totalStudentPages === 0) {
+            currentStudentPage = 0;
+            page = 0;
+        }
+
         const start = page * studentsPerPage;
         const end = start + studentsPerPage;
-        const studentsToDisplay = studentData.slice(start, end);
+        const studentsToDisplay = filteredStudents.slice(start, end);
 
         studentTableBody.innerHTML = '';
 
@@ -795,9 +959,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentStudentPageDisplay.textContent = page + 1;
         totalStudentPagesDisplay.textContent = totalStudentPages > 0 ? totalStudentPages : 1;
+
+        // Disable/enable student pagination arrows
+        prevStudentPageArrow.style.opacity = currentStudentPage === 0 ? '0.5' : '1';
+        prevStudentPageArrow.style.pointerEvents = currentStudentPage === 0 ? 'none' : 'auto';
+        nextStudentPageArrow.style.opacity = (currentStudentPage >= totalStudentPages - 1 && totalStudentPages > 0) ? '0.5' : '1';
+        nextStudentPageArrow.style.pointerEvents = (currentStudentPage >= totalStudentPages - 1 && totalStudentPages > 0) ? 'none' : 'auto';
     }
 
     function renderAnnouncementTable(page) {
+        // Ensure 'no' property is correct for all announcements
+        announcementData.forEach((ann, index) => {
+            ann.no = index + 1;
+        });
+        localStorage.setItem('announcementData', JSON.stringify(announcementData)); // Save re-numbered data
+
+        totalAnnouncementPages = Math.ceil(announcementData.length / announcementsPerPage);
+        if (page >= totalAnnouncementPages && totalAnnouncementPages > 0) {
+            currentAnnouncementPage = totalAnnouncementPages - 1;
+            page = currentAnnouncementPage;
+        } else if (totalAnnouncementPages === 0) {
+            currentAnnouncementPage = 0;
+            page = 0;
+        }
+
         const start = page * announcementsPerPage;
         const end = start + announcementsPerPage;
         const announcementsToDisplay = announcementData.slice(start, end);
@@ -812,22 +997,46 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${announcement.judul}</td>
                     <td>${announcement.mapel}</td>
                     <td><a href="#" class="view-details-link" data-id="${announcement.id}">Lihat selengkapnya</a></td>
+                    <td class="action-buttons">
+                        <button class="action-button edit-button" data-id="${announcement.id}" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-button" data-id="${announcement.id}" title="Hapus"><i class="fas fa-trash"></i></button>
+                    </td>
                 `;
                 announcementTableBody.appendChild(row);
             });
         } else {
-            announcementTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; opacity: 0.7; padding: 20px;">Belum ada pengumuman.</td></tr>';
+            announcementTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; opacity: 0.7; padding: 20px;">Belum ada pengumuman.</td></tr>';
         }
 
         currentAnnouncementPageDisplay.textContent = page + 1;
-        totalAnnouncementPages = Math.ceil(announcementData.length / announcementsPerPage);
         totalAnnouncementPagesDisplay.textContent = totalAnnouncementPages > 0 ? totalAnnouncementPages : 1;
+
+        // Disable/enable announcement pagination arrows
+        prevAnnouncementPageArrow.style.opacity = currentAnnouncementPage === 0 ? '0.5' : '1';
+        prevAnnouncementPageArrow.style.pointerEvents = currentAnnouncementPage === 0 ? 'none' : 'auto';
+        nextAnnouncementPageArrow.style.opacity = (currentAnnouncementPage >= totalAnnouncementPages - 1 && totalAnnouncementPages > 0) ? '0.5' : '1';
+        nextAnnouncementPageArrow.style.pointerEvents = (currentAnnouncementPage >= totalAnnouncementPages - 1 && totalAnnouncementPages > 0) ? 'none' : 'auto';
+
 
         document.querySelectorAll('.view-details-link').forEach(link => {
             link.addEventListener('click', (event) => {
                 event.preventDefault();
                 const announcementId = event.target.dataset.id;
                 showAnnouncementDetailModal(announcementId);
+            });
+        });
+
+        document.querySelectorAll('.edit-button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const announcementId = event.currentTarget.dataset.id;
+                showManageAnnouncementView(announcementId);
+            });
+        });
+
+        document.querySelectorAll('.delete-button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                announcementToDeleteId = event.currentTarget.dataset.id;
+                showDeleteConfirmModal();
             });
         });
     }
@@ -837,7 +1046,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (announcement) {
             announcementDetailModalTitle.textContent = announcement.judul;
             announcementDetailSubject.textContent = announcement.mapel;
-            // Format deadline to a readable date
             const deadlineDate = new Date(announcement.deadline);
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             announcementDetailDeadline.textContent = deadlineDate.toLocaleDateString('id-ID', options);
@@ -862,54 +1070,121 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    addAnnouncementForm.addEventListener('submit', (event) => {
+    manageAnnouncementForm.addEventListener('submit', (event) => {
         event.preventDefault();
         clearAnnouncementErrorMessages();
 
-        let isValid = true;
+        const submitButtonText = submitAnnouncementButton.querySelector('.button-text');
+        const submitButtonSpinner = submitAnnouncementButton.querySelector('.loading-spinner');
 
-        const title = announcementTitleInput.value.trim();
-        const subject = announcementSubjectInput.value.trim();
-        const deadline = announcementDeadlineInput.value;
-        const content = announcementContentInput.value.trim();
+        submitButtonText.classList.add('hidden');
+        submitButtonSpinner.classList.remove('hidden');
+        submitAnnouncementButton.disabled = true;
 
-        if (title === "") {
-            displayErrorMessage(errorAnnouncementTitle, "Judul pengumuman tidak boleh kosong.");
-            isValid = false;
-        }
-        if (subject === "") {
-            displayErrorMessage(errorAnnouncementSubject, "Mata Pelajaran tidak boleh kosong.");
-            isValid = false;
-        } else if (!subjectDatabase.includes(subject)) {
-            displayErrorMessage(errorAnnouncementSubject, "Mata Pelajaran tidak valid.");
-            isValid = false;
-        }
-        if (deadline === "") {
-            displayErrorMessage(errorAnnouncementDeadline, "Deadline tidak boleh kosong.");
-            isValid = false;
-        }
-        if (content === "") {
-            displayErrorMessage(errorAnnouncementContent, "Isi pengumuman tidak boleh kosong.");
-            isValid = false;
-        }
+        setTimeout(() => {
+            let isValid = true;
 
-        if (isValid) {
-            const newAnnouncement = {
-                id: Date.now(), // Unique ID based on timestamp
-                no: announcementData.length + 1, // Simple sequential numbering
-                judul: title,
-                mapel: subject,
-                deadline: deadline,
-                isi: content
-            };
-            announcementData.push(newAnnouncement);
+            const id = announcementIdInput.value;
+            const title = announcementTitleInput.value.trim();
+            const subject = announcementSubjectInput.value.trim();
+            const deadline = announcementDeadlineInput.value;
+            const content = announcementContentInput.value.trim();
+
+            if (title === "") {
+                displayErrorMessage(errorAnnouncementTitle, "Judul pengumuman tidak boleh kosong.");
+                isValid = false;
+            }
+            if (subject === "") {
+                displayErrorMessage(errorAnnouncementSubject, "Mata Pelajaran tidak boleh kosong.");
+                isValid = false;
+            } else if (!subjectDatabase.includes(subject)) {
+                displayErrorMessage(errorAnnouncementSubject, "Mata Pelajaran tidak valid. Pilih dari daftar yang tersedia.");
+                isValid = false;
+            }
+            if (deadline === "") {
+                displayErrorMessage(errorAnnouncementDeadline, "Deadline tidak boleh kosong.");
+                isValid = false;
+            } else {
+                const selectedDate = new Date(deadline);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Normalize today's date
+                if (selectedDate < today) {
+                    displayErrorMessage(errorAnnouncementDeadline, "Deadline tidak boleh di tanggal yang sudah lewat.");
+                    isValid = false;
+                }
+            }
+            if (content === "") {
+                displayErrorMessage(errorAnnouncementContent, "Isi pengumuman tidak boleh kosong.");
+                isValid = false;
+            }
+
+            if (isValid) {
+                if (id) {
+                    const index = announcementData.findIndex(ann => ann.id == id);
+                    if (index !== -1) {
+                        announcementData[index] = { ...announcementData[index], judul: title, mapel: subject, deadline: deadline, isi: content };
+                        showSnackbar('Pengumuman berhasil diperbarui!', 'success');
+                    }
+                } else {
+                    const newAnnouncement = {
+                        id: Date.now(), // Unique ID
+                        // no: announcementData.length + 1, // 'no' will be re-indexed in renderAnnouncementTable
+                        judul: title,
+                        mapel: subject,
+                        deadline: deadline,
+                        isi: content
+                    };
+                    announcementData.push(newAnnouncement);
+                    showSnackbar('Pengumuman berhasil dipublikasikan!', 'success');
+                }
+                localStorage.setItem('announcementData', JSON.stringify(announcementData));
+                showAnnouncementView(); // Go back to announcement list and re-render
+                // The re-rendering in showAnnouncementView will handle page reset
+            } else {
+                showSnackbar('Gagal menyimpan pengumuman. Periksa kembali input Anda.', 'error');
+            }
+
+            submitButtonText.classList.remove('hidden');
+            submitButtonSpinner.classList.add('hidden');
+            submitAnnouncementButton.disabled = false;
+
+        }, 1000);
+    });
+
+    function showDeleteConfirmModal() {
+        deleteConfirmModalOverlay.classList.add('visible');
+        body.style.overflow = 'hidden';
+    }
+
+    function hideDeleteConfirmModal() {
+        deleteConfirmModalOverlay.classList.remove('visible');
+        body.style.overflow = '';
+        announcementToDeleteId = null;
+    }
+
+    confirmDeleteButton.addEventListener('click', () => {
+        if (announcementToDeleteId) {
+            announcementData = announcementData.filter(ann => ann.id != announcementToDeleteId);
+            // Re-index 'no' for all announcements after deletion
+            announcementData.forEach((ann, index) => {
+                ann.no = index + 1;
+            });
             localStorage.setItem('announcementData', JSON.stringify(announcementData));
-            
-            showAnnouncementView();
-            currentAnnouncementPage = 0; 
-            renderAnnouncementTable(currentAnnouncementPage);
+            hideDeleteConfirmModal();
+            showAnnouncementView(); // Go back to announcement list and re-render
+            showSnackbar('Pengumuman berhasil dihapus!', 'success');
         }
     });
+
+    cancelDeleteButton.addEventListener('click', hideDeleteConfirmModal);
+
+    closeDeleteConfirmModal.addEventListener('click', hideDeleteConfirmModal);
+    deleteConfirmModalOverlay.addEventListener('click', (event) => {
+        if (event.target === deleteConfirmModalOverlay) {
+            hideDeleteConfirmModal();
+        }
+    });
+
 
     jadwalBox.addEventListener('click', showJadwalView);
     studentBox.addEventListener('click', showStudentView);
@@ -925,67 +1200,120 @@ document.addEventListener('DOMContentLoaded', () => {
         showMainView();
     });
 
-    // Cover View Buttons
-    goToHomepageButton.addEventListener('click', () => {
-        document.querySelector('.container').classList.remove('hidden-view'); // Ensure main content is visible
-        showMainView();
-    });
+    // Fix for Settings button on Cover View (direct to Settings)
     goToSettingsButton.addEventListener('click', () => {
-        document.querySelector('.container').classList.remove('hidden-view'); // Ensure main content is visible
         showSettingsView();
     });
-    goToCreditButton.addEventListener('click', () => {
-        alert('Halaman Credit akan segera dibuat!');
-        // showCreditView(); // Implement this later
+
+    // Fix for Go Home button on Cover View (direct to Main View)
+    goToHomepageButton.addEventListener('click', () => {
+        showMainView();
     });
 
+    goToCreditButton.addEventListener('click', () => {
+        showCreditView();
+    });
+
+    creditBackButton.addEventListener('click', () => {
+        showView(coverView);
+    });
+
+    dayDisplayBubble.addEventListener('click', (event) => {
+        // Only toggle if the click is on the bubble itself or its direct children (excluding dropdown items)
+        if (event.target === dayDisplayBubble || event.target.closest('.day-display-bubble') === dayDisplayBubble) {
+            toggleDayDropdown();
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        // Close dropdown if click outside
+        if (!dayDisplayBubble.contains(event.target) && !customDayDropdown.contains(event.target)) {
+            toggleDayDropdown(false);
+        }
+    });
 
     prevDayArrow.addEventListener('click', () => {
         currentDayIndex = (currentDayIndex - 1 + days.length) % days.length;
         currentDayDisplay.textContent = days[currentDayIndex];
-        displayJadwal(days[currentDayIndex]);
+        displayJadwal(days[currentDayIndex], jadwalSearchInput.value.trim());
         updateSelectedDayClass();
     });
 
     nextDayArrow.addEventListener('click', () => {
         currentDayIndex = (currentDayIndex + 1) % days.length;
         currentDayDisplay.textContent = days[currentDayIndex];
-        displayJadwal(days[currentDayIndex]);
+        displayJadwal(days[currentDayIndex], jadwalSearchInput.value.trim());
         updateSelectedDayClass();
     });
 
+    jadwalSearchInput.addEventListener('input', debounce(function() {
+        displayJadwal(days[currentDayIndex], jadwalSearchInput.value.trim());
+    }, 300));
+
+
     prevSubjectPageArrow.addEventListener('click', () => {
-        currentTeacherPage = (currentTeacherPage - 1 + totalPages) % totalPages;
-        renderSubjectBoxes(currentTeacherPage);
+        if (currentTeacherPage > 0) {
+            currentTeacherPage--;
+            renderSubjectBoxes(currentTeacherPage);
+        }
     });
 
     nextSubjectPageArrow.addEventListener('click', () => {
-        currentTeacherPage = (currentTeacherPage + 1) % totalPages;
-        renderSubjectBoxes(currentTeacherPage);
+        // Ensure totalPages is correctly calculated
+        totalPages = Math.ceil(subjectNames.length / itemsPerPage);
+        if (currentTeacherPage < totalPages - 1) {
+            currentTeacherPage++;
+            renderSubjectBoxes(currentTeacherPage);
+        }
     });
 
+
     prevStudentPageArrow.addEventListener('click', () => {
-        currentStudentPage = (currentStudentPage - 1 + totalStudentPages) % totalStudentPages;
-        renderStudentTable(currentStudentPage);
+        if (currentStudentPage > 0) {
+            currentStudentPage--;
+            renderStudentTable(currentStudentPage, studentSearchInput.value.trim());
+        }
     });
 
     nextStudentPageArrow.addEventListener('click', () => {
-        currentStudentPage = (currentStudentPage + 1) % totalStudentPages;
-        renderStudentTable(currentStudentPage);
+        // Ensure totalStudentPages is correctly calculated based on current filtered data
+        const currentFilteredStudents = studentData.filter(student =>
+            student.nama.toLowerCase().includes(studentSearchInput.value.toLowerCase().trim()) ||
+            String(student.nis).includes(studentSearchInput.value.toLowerCase().trim()) ||
+            String(student.nisn).includes(studentSearchInput.value.toLowerCase().trim())
+        );
+        totalStudentPages = Math.ceil(currentFilteredStudents.length / studentsPerPage);
+
+        if (currentStudentPage < totalStudentPages - 1) {
+            currentStudentPage++;
+            renderStudentTable(currentStudentPage, studentSearchInput.value.trim());
+        }
     });
 
+    studentSearchInput.addEventListener('input', debounce(function() {
+        currentStudentPage = 0; // Reset to first page on new search
+        renderStudentTable(currentStudentPage, studentSearchInput.value.trim());
+    }, 300));
+
+
     prevAnnouncementPageArrow.addEventListener('click', () => {
-        currentAnnouncementPage = (currentAnnouncementPage - 1 + totalAnnouncementPages) % totalAnnouncementPages;
-        renderAnnouncementTable(currentAnnouncementPage);
+        if (currentAnnouncementPage > 0) {
+            currentAnnouncementPage--;
+            renderAnnouncementTable(currentAnnouncementPage);
+        }
     });
 
     nextAnnouncementPageArrow.addEventListener('click', () => {
-        currentAnnouncementPage = (currentAnnouncementPage + 1) % totalAnnouncementPages;
-        renderAnnouncementTable(currentAnnouncementPage);
+        // Ensure totalAnnouncementPages is correctly calculated
+        totalAnnouncementPages = Math.ceil(announcementData.length / announcementsPerPage);
+        if (currentAnnouncementPage < totalAnnouncementPages - 1) {
+            currentAnnouncementPage++;
+            renderAnnouncementTable(currentAnnouncementPage);
+        }
     });
 
-    addAnnouncementButton.addEventListener('click', showAddAnnouncementView);
-    addAnnouncementBackButton.addEventListener('click', showAnnouncementView);
+    addAnnouncementButton.addEventListener('click', () => showManageAnnouncementView(null));
+    manageAnnouncementBackButton.addEventListener('click', showAnnouncementView);
 
     closeTeacherModalButton.addEventListener('click', hideTeacherModal);
     teacherDetailModalOverlay.addEventListener('click', (event) => {
@@ -1001,7 +1329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    headerSearchInput.addEventListener('input', handleSearch);
+    headerSearchInput.addEventListener('input', handleTeacherSearchDebounced);
     closeSearchModalButton.addEventListener('click', hideSearchResultsModal);
     searchResultsModalOverlay.addEventListener('click', (event) => {
         if (event.target === searchResultsModalOverlay) {
@@ -1009,19 +1337,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    dayDisplayBubble.addEventListener('click', (event) => {
-        if (!event.target.classList.contains('custom-dropdown-item') && !event.target.closest('.custom-dropdown-content')) {
-            toggleDayDropdown();
+    // Universal active/focused state for clickable elements and inputs
+    document.querySelectorAll('.grid-item, .settings-item-full, .other-item, .cover-button, .day-nav-arrow, .pagination-arrow, .login-button, .publish-button, .add-announcement-button, .action-button, .confirm-button, .login-specific-top-bar .back-button, .credit-specific-top-bar .back-button').forEach(item => {
+        item.addEventListener('mousedown', (e) => {
+            e.currentTarget.classList.add('active');
+        });
+        item.addEventListener('mouseup', (e) => {
+            e.currentTarget.classList.remove('active');
+        });
+        item.addEventListener('mouseleave', (e) => {
+            e.currentTarget.classList.remove('active');
+        });
+        if (item.tagName === 'INPUT' || item.tagName === 'TEXTAREA') {
+            item.addEventListener('focus', (e) => {
+                e.currentTarget.classList.add('focused');
+            });
+            item.addEventListener('blur', (e) => {
+                e.currentTarget.classList.remove('focused');
+            });
         }
     });
 
-    document.addEventListener('click', (event) => {
-        if (!dayDisplayBubble.contains(event.target) && !customDayDropdown.contains(event.target)) {
-            toggleDayDropdown(false);
-        }
-    });
 
+    // Initial setup when DOM is loaded
     loadUserProfile();
-    populateSubjectDatalist(); // Populate datalist on load
-    showView(coverView); // Start with the Cover view
+    populateSubjectDatalist();
+    showView(coverView); // Start with the cover view
 });
