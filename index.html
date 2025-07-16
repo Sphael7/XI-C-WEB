@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&family=Shantell+Sans:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body class="dark-mode">
 
@@ -80,6 +81,11 @@
                     </div>
                 </div>
                 <i class="fas fa-chevron-right day-nav-arrow" id="next-day"></i>
+            </div>
+
+            <div class="jadwal-search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Cari Mata Pelajaran atau Guru..." class="search-input" id="jadwal-search-input">
             </div>
 
             <div id="jadwal-list" class="jadwal-list">
@@ -173,7 +179,10 @@
                         <input type="number" id="input-nis" placeholder="Diisi NIS">
                         <p class="error-message" id="error-nis"></p>
                     </div>
-                    <button type="submit" class="lets-go-button">Let's Go!</button>
+                    <button type="submit" class="lets-go-button" id="lets-go-button-login">
+                        <span class="button-text">Let's Go!</span>
+                        <i class="fas fa-spinner fa-spin loading-spinner hidden"></i>
+                    </button>
                 </form>
             </main>
             <footer class="login-footer">
@@ -214,6 +223,10 @@
         <div id="student-view" class="hidden-view">
             <main class="student-content">
                 <h2 class="student-title">Data Murid XI-C</h2>
+                <div class="student-search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Cari Nama, NIS, atau NISN..." class="search-input" id="student-search-input">
+                </div>
                 <div class="student-table-container">
                     <table class="student-table">
                         <thead>
@@ -249,6 +262,7 @@
                                 <th>Judul</th>
                                 <th>Mata Pelajaran</th>
                                 <th>Isi</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="announcement-table-body">
@@ -270,16 +284,17 @@
             </main>
         </div>
 
-        <div id="add-announcement-view" class="hidden-view">
+        <div id="manage-announcement-view" class="hidden-view">
             <header class="top-bar add-announcement-specific-top-bar">
-                <div class="back-button add-announcement-back-button" id="add-announcement-back-button">
+                <div class="back-button add-announcement-back-button" id="manage-announcement-back-button">
                     <i class="fas fa-arrow-left"></i>
                     <span>Back</span>
                 </div>
             </header>
             <main class="add-announcement-content">
-                <h2 class="add-announcement-title">Tambah Pengumuman</h2>
-                <form id="add-announcement-form">
+                <h2 class="add-announcement-title" id="manage-announcement-title">Tambah Pengumuman</h2>
+                <form id="manage-announcement-form">
+                    <input type="hidden" id="announcement-id-input">
                     <div class="input-group">
                         <label for="announcement-title-input">Judul:</label>
                         <input type="text" id="announcement-title-input" placeholder="Judul Pengumuman">
@@ -301,7 +316,10 @@
                         <textarea id="announcement-content-input" placeholder="Isi Pengumuman"></textarea>
                         <p class="error-message" id="error-announcement-content"></p>
                     </div>
-                    <button type="submit" class="publish-button" id="publish-announcement-button">Publish</button>
+                    <button type="submit" class="publish-button" id="submit-announcement-button">
+                        <span class="button-text">Publish</span>
+                        <i class="fas fa-spinner fa-spin loading-spinner hidden"></i>
+                    </button>
                 </form>
             </main>
         </div>
@@ -319,7 +337,6 @@
                 </div>
             </div>
         </div>
-
 
         <div class="search-results-modal-overlay hidden" id="search-results-modal-overlay">
             <div class="search-results-modal-content">
@@ -345,7 +362,6 @@
                 </div>
             </div>
         </div>
-
 
         <footer class="bottom-bar" id="global-bottom-bar">
             <div class="back-button" id="global-home-button-footer">
@@ -379,6 +395,61 @@
                         <tbody id="modal-teacher-table-body">
                             </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="credit-view" class="hidden-view">
+        <header class="top-bar credit-specific-top-bar">
+            <div class="back-button credit-back-button" id="credit-back-button">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Cover</span>
+            </div>
+        </header>
+        <main class="credit-content">
+            <h2 class="credit-title">CREDIT</h2>
+            <hr class="credit-divider">
+
+            <section class="credit-section team">
+                <h3><i class="fas fa-brain"></i> Tim Pengembang</h3>
+                <p><strong>Lead Developer:</strong> <span class="developer-name">Christopher Alberto Hamonangan – XI-C</span><br>
+                Bertanggung jawab atas keseluruhan proses pengembangan teknis website, termasuk struktur proyek, pengelolaan versi kode melalui GitHub, kolaborasi tim, serta proses deployment menggunakan Vercel.</p>
+                <p><strong>UI Designer:</strong> <span class="developer-name">Faiz Syawaludin Wibowo – XI-C</span><br>
+                Merancang antarmuka pengguna dengan fokus pada estetika visual, pemilihan warna, tipografi, dan tata letak halaman untuk memastikan tampilan yang konsisten dan menarik.</p>
+                <p><strong>UX Designer:</strong> <span class="developer-name">Belum ditunjuk</span><br>
+                Posisi ini akan bertugas mengoptimalkan alur interaksi pengguna, memastikan kemudahan navigasi, dan menciptakan pengalaman pengguna yang efisien dan intuitif.</p>
+                <p><strong>Front-End Developer:</strong> <span class="developer-name">Christopher Alberto Hamonangan – XI-C</span><br>
+                Menerapkan desain antarmuka ke dalam bentuk kode menggunakan teknologi HTML, CSS, dan JavaScript, serta memastikan tampilan website responsif dan fungsional pada berbagai perangkat.</p>
+                <p><strong>Content Writer:</strong> <span class="developer-name">Belum ditunjuk</span><br>
+                Posisi ini bertanggung jawab untuk menyusun dan mengelola konten tertulis pada website, seperti deskripsi halaman, profil kelas, dan informasi penting lainnya.</p>
+                <p><strong>Tester:</strong> <span class="developer-name">Fide Cristo Hasiholan Tambunan – XI-C</span><br>
+                Melakukan pengujian terhadap seluruh fitur dan halaman website guna memastikan tidak terdapat kesalahan teknis (bug), serta memberikan masukan yang membangun untuk meningkatkan kualitas tampilan dan pengalaman pengguna.</p>
+            </section>
+
+            <section class="credit-section license">
+                <h3><i class="fas fa-lock"></i> Catatan Lisensi</h3>
+                <p>Seluruh isi dan struktur dari website XI-C Website dikembangkan secara orisinal oleh siswa kelas XI-C untuk kepentingan internal, edukatif, dan non-komersial. Hak cipta atas kode sumber, struktur halaman, serta konten tertulis sepenuhnya dimiliki oleh tim pengembang.</p>
+                <p>Website ini tidak diperuntukkan untuk penggunaan komersial atau distribusi tanpa izin tertulis dari pengembang. Penggunaan kembali sebagian atau seluruh elemen dalam proyek ini diperbolehkan hanya untuk tujuan pembelajaran atau pengembangan pribadi, dengan mencantumkan atribusi yang sesuai.</p>
+                <p>Apabila terdapat elemen tertentu yang melibatkan konten pihak ketiga, seluruh hak cipta tetap dimiliki oleh pemilik aslinya. Jika terdapat pelanggaran hak cipta yang tidak disengaja, mohon hubungi pengembang untuk dilakukan penyesuaian atau penghapusan sesuai ketentuan yang berlaku.</p>
+            </section>
+        </main>
+        <footer class="credit-footer">
+            <p>&copy; 2025 XI-C Web</p>
+        </footer>
+    </div>
+    <div id="snackbar" class="snackbar"></div>
+    <div id="delete-confirm-modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content small-modal">
+            <div class="modal-header">
+                <h3>Konfirmasi Hapus</h3>
+                <i class="fas fa-times close-modal-button" id="close-delete-confirm-modal"></i>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus pengumuman ini?</p>
+                <div class="confirm-buttons">
+                    <button class="confirm-button cancel-button" id="cancel-delete">Batal</button>
+                    <button class="confirm-button delete-button" id="confirm-delete">Hapus</button>
                 </div>
             </div>
         </div>
