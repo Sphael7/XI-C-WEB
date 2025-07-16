@@ -20,7 +20,8 @@ body {
     padding: 0;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    flex-grow: 1; /* Pastikan container mengisi ruang vertikal */
+    min-height: 0; /* Penting untuk flex-grow bekerja dengan benar */
 }
 
 .top-bar,
@@ -35,19 +36,23 @@ body {
 .teacher-content,
 .student-content,
 .announcement-content,
-.add-announcement-content {
+.add-announcement-content,
+.credit-content { /* Tambahkan credit-content */
     padding-left: 20px;
     padding-right: 20px;
+    box-sizing: border-box; /* Pastikan padding tidak menambah lebar/tinggi di luar box-model */
 }
 
 .top-bar {
     padding-top: 15px;
     padding-bottom: 15px;
     position: relative;
+    flex-shrink: 0; /* Pastikan top bar tidak menyusut */
 }
 .bottom-bar {
     padding-top: 15px;
     padding-bottom: 15px;
+    flex-shrink: 0; /* Pastikan bottom bar tidak menyusut */
 }
 
 .grid-item,
@@ -56,19 +61,26 @@ body {
     padding: 20px;
 }
 
-.content-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: auto auto auto;
-    gap: 20px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    box-sizing: border-box;
-    width: 100%;
+.content-grid,
+.jadwal-list,
+.settings-content,
+.profile-content,
+.login-content,
+.other-content,
+.teacher-content,
+.student-content,
+.announcement-content,
+.add-announcement-content,
+.credit-content { /* Pastikan konten utama di setiap view bisa menggulir dan tidak memanjang kosong */
     flex-grow: 1;
-    align-content: flex-start;
+    overflow-y: auto; /* Memungkinkan konten menggulir */
+    -webkit-overflow-scrolling: touch;
+    height: auto; /* Biarkan tinggi menyesuaikan konten */
+    min-height: 0; /* Penting untuk flex item dengan overflow */
 }
 
+
+/* Pembaruan Transisi View */
 .active-view {
     display: flex;
     flex-direction: column;
@@ -76,30 +88,51 @@ body {
     flex-grow: 1;
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    position: relative; /* Agar z-index bekerja untuk tumpukan view */
+    z-index: 1;
 }
 
 .hidden-view {
-    display: none;
+    display: none; /* Awalnya display: none */
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+    transition: opacity 0.5s ease-in, transform 0.5s ease-in;
     pointer-events: none;
+    position: absolute; /* Agar tidak memakan ruang saat hidden */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
 }
+/* Menambahkan .view-entering untuk transisi masuk yang lebih baik */
+.view-entering { /* State sebelum .active-view saat masuk */
+    display: flex !important; /* Override display:none */
+    opacity: 0;
+    transform: translateY(20px);
+    position: absolute; /* Tetap absolute saat mulai masuk agar tidak ganggu layout */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Pastikan di atas yang keluar */
+    transition: none; /* No transition yet */
+}
+
+.view-entering.active-view { /* Saat transisi masuk aktif */
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    position: relative; /* Kembali ke relative setelah transisi masuk */
+}
+
 
 .view-exit {
     opacity: 0;
     transform: translateY(-20px);
     pointer-events: none;
-}
-
-.view-enter {
-    opacity: 0;
-    transform: translateY(20px);
-}
-.view-enter-active {
-    opacity: 1;
-    transform: translateY(0);
+    transition: opacity 0.5s ease-in, transform 0.5s ease-in;
 }
 
 
@@ -357,7 +390,6 @@ body.light-mode .bottom-bar span {
     padding-bottom: 20px;
     box-sizing: border-box;
     width: 100%;
-    flex-grow: 1;
     align-content: flex-start;
 }
 
@@ -597,6 +629,33 @@ body.light-mode .custom-dropdown-item.selected {
     color: #333;
 }
 
+/* Style untuk pencarian jadwal dan murid */
+.jadwal-search-container,
+.student-search-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 20px auto;
+    padding: 10px 20px;
+    box-sizing: border-box;
+}
+.jadwal-search-container .search-input,
+.student-search-container .search-input {
+    padding: 10px 15px;
+    border-radius: 20px;
+}
+body.dark-mode .jadwal-search-container .search-input,
+body.dark-mode .student-search-container .search-input {
+    background-color: #2A1747;
+    border: 1px solid #4B277C;
+}
+body.light-mode .jadwal-search-container .search-input,
+body.light-mode .student-search-container .search-input {
+    background-color: #FDFDFD;
+    border: 1px solid #DCDCDC;
+}
+
 
 /* Jadwal List Styles */
 .jadwal-list {
@@ -605,8 +664,6 @@ body.light-mode .custom-dropdown-item.selected {
     gap: 15px;
     width: 100%;
     padding-bottom: 20px;
-    box-sizing: border-box;
-    flex-grow: 1;
 }
 
 .jadwal-item {
@@ -680,8 +737,6 @@ body.light-mode .jadwal-item .mapel {
     gap: 20px;
     padding-top: 20px;
     padding-bottom: 20px;
-    box-sizing: border-box;
-    flex-grow: 1;
 }
 
 .settings-title {
@@ -733,6 +788,17 @@ body.light-mode .settings-item-full {
     transform: translateY(-3px);
     box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.15);
 }
+/* Efek active untuk settings-item-full */
+.settings-item-full:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    filter: brightness(0.9);
+}
+body.dark-mode .settings-item-full:active {
+    filter: brightness(0.8);
+}
+
+
 .settings-item-full h3 {
     margin: 0;
     font-family: 'Montserrat', sans-serif;
@@ -787,7 +853,6 @@ body.light-mode .about-us-title {
     gap: 20px;
     padding-top: 20px;
     padding-bottom: 20px;
-    flex-grow: 1;
 }
 
 .profile-title {
@@ -906,6 +971,11 @@ body.light-mode .login-button {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
+.login-button:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    filter: brightness(0.9);
+}
 
 /* Login View Specific Styles */
 .login-specific-top-bar {
@@ -951,7 +1021,6 @@ body.light-mode .login-specific-top-bar .back-button {
     gap: 15px;
     padding-top: 20px;
     padding-bottom: 20px;
-    flex-grow: 1;
 }
 
 .login-title {
@@ -1050,10 +1119,27 @@ body.dark-mode .error-message {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .lets-go-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 7px 18px rgba(0, 0, 0, 0.5);
+}
+.lets-go-button:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    filter: brightness(0.9);
+}
+
+/* Spinner styling */
+.loading-spinner {
+    margin-left: 10px;
+    color: #333;
+}
+.loading-spinner.hidden {
+    display: none;
 }
 
 .login-footer {
@@ -1086,8 +1172,6 @@ body.light-mode .copyright-text {
     align-items: center;
     padding-top: 20px;
     padding-bottom: 20px;
-    box-sizing: border-box;
-    flex-grow: 1;
 }
 
 body.dark-mode #other-view .other-content {
@@ -1133,6 +1217,11 @@ body.light-mode .other-item {
 .other-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+.other-item:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    filter: brightness(0.9);
 }
 
 .other-item h3 {
@@ -1191,8 +1280,6 @@ body.light-mode #real-time-wib {
     align-items: center;
     padding-top: 20px;
     padding-bottom: 20px;
-    box-sizing: border-box;
-    flex-grow: 1;
 }
 
 .subject-grid-container {
@@ -1272,6 +1359,12 @@ body.light-mode .subject-box {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 }
+.subject-box:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    filter: brightness(0.9);
+}
+
 .subject-box h3 {
     margin: 0;
     font-family: 'Playfair Display', serif;
@@ -1299,7 +1392,7 @@ body.light-mode .subject-box h3 {
     cursor: pointer;
     padding: 5px 10px;
     border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, opacity 0.3s ease, pointer-events 0.3s ease;
 }
 body.dark-mode .pagination-arrow {
     color: #FFD700;
@@ -1310,6 +1403,10 @@ body.dark-mode .pagination-arrow:hover {
 body.light-mode .pagination-arrow:hover {
     background-color: rgba(0, 0, 0, 0.05);
 }
+.pagination-arrow:active {
+    filter: brightness(0.9);
+}
+
 .page-number-display {
     font-size: 1.1em;
     font-weight: bold;
@@ -1404,6 +1501,9 @@ body.light-mode .close-modal-button {
 }
 body.light-mode .close-modal-button:hover {
     color: #333;
+}
+.close-modal-button:active {
+    filter: brightness(0.9);
 }
 
 .modal-body {
@@ -1577,6 +1677,9 @@ body.light-mode .close-search-modal-button {
 body.light-mode .close-search-modal-button:hover {
     color: #333;
 }
+.close-search-modal-button:active {
+    filter: brightness(0.9);
+}
 
 .search-results-modal-body {
     padding: 15px 20px;
@@ -1612,8 +1715,6 @@ body.light-mode .close-search-modal-button:hover {
     align-items: center;
     padding-top: 20px;
     padding-bottom: 20px;
-    box-sizing: border-box;
-    flex-grow: 1;
 }
 
 .student-title {
@@ -1754,8 +1855,6 @@ body.light-mode .student-table tbody tr:hover {
     align-items: center;
     padding-top: 20px;
     padding-bottom: 20px;
-    box-sizing: border-box;
-    flex-grow: 1;
 }
 
 .announcement-title {
@@ -1877,9 +1976,11 @@ body.light-mode .announcement-table tbody tr:hover {
 }
 
 .announcement-table th:nth-child(1), .announcement-table td:nth-child(1) { width: 8%; }
-.announcement-table th:nth-child(2), .announcement-table td:nth-child(2) { width: 35%; text-align: left; padding-left: 10px;}
-.announcement-table th:nth-child(3), .announcement-table td:nth-child(3) { width: 27%; text-align: left; padding-left: 10px;}
-.announcement-table th:nth-child(4), .announcement-table td:nth-child(4) { width: 30%; }
+.announcement-table th:nth-child(2), .announcement-table td:nth-child(2) { width: 30%; text-align: left; padding-left: 10px;}
+.announcement-table th:nth-child(3), .announcement-table td:nth-child(3) { width: 25%; text-align: left; padding-left: 10px;}
+.announcement-table th:nth-child(4), .announcement-table td:nth-child(4) { width: 25%; }
+.announcement-table th:nth-child(5), .announcement-table td:nth-child(5) { width: 12%; } /* Kolom Aksi */
+
 
 .announcement-table td:nth-child(2),
 .announcement-table td:nth-child(3),
@@ -1888,6 +1989,56 @@ body.light-mode .announcement-table tbody tr:hover {
     overflow: visible;
     text-overflow: clip;
 }
+
+/* Gaya untuk tombol Aksi di tabel pengumuman */
+.announcement-table .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.announcement-table .action-button {
+    font-size: 1.1em;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.announcement-table .action-button:hover {
+    filter: brightness(1.2);
+}
+.announcement-table .action-button:active {
+    transform: translateY(1px);
+}
+
+.announcement-table .edit-button {
+    color: #00BFFF;
+}
+body.dark-mode .announcement-table .edit-button {
+    color: #4CAF50;
+}
+body.light-mode .announcement-table .edit-button {
+    color: #4CAF50;
+}
+.announcement-table .edit-button:hover {
+    background-color: rgba(76, 175, 80, 0.2);
+}
+
+.announcement-table .delete-button {
+    color: #FF6347;
+}
+body.dark-mode .announcement-table .delete-button {
+    color: #f44336;
+}
+body.light-mode .announcement-table .delete-button {
+    color: #f44336;
+}
+.announcement-table .delete-button:hover {
+    background-color: rgba(244, 67, 54, 0.2);
+}
+
 
 .announcement-table .view-details-link {
     font-weight: bold;
@@ -1942,8 +2093,13 @@ body.light-mode .add-announcement-button {
     transform: translateY(-3px) scale(1.05);
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
 }
+.add-announcement-button:active {
+    transform: translateY(0px) scale(1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    filter: brightness(0.9);
+}
 
-/* Add Announcement View Styles */
+/* Manage Announcement View Styles (Sebelumnya Add Announcement View) */
 .add-announcement-specific-top-bar {
     display: flex;
     justify-content: flex-start;
@@ -1985,7 +2141,6 @@ body.light-mode .add-announcement-specific-top-bar .back-button {
     gap: 15px;
     padding-top: 20px;
     padding-bottom: 20px;
-    flex-grow: 1;
 }
 
 .add-announcement-title {
@@ -2015,6 +2170,9 @@ body.light-mode .add-announcement-title {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 body.light-mode .publish-button {
     background: linear-gradient(145deg, #D1BBDE, #E1CEE9);
@@ -2024,6 +2182,11 @@ body.light-mode .publish-button {
 .publish-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 7px 18px rgba(0,0,0,0.5);
+}
+.publish-button:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    filter: brightness(0.9);
 }
 
 /* Announcement Detail Modal Specific Styles */
@@ -2051,9 +2214,9 @@ body.light-mode .announcement-detail-content {
     border-top: 1px solid rgba(0,0,0,0.08);
 }
 
-/* NEW: Cover View Styles */
+/* Cover View Specific Styles */
 #cover-view {
-    position: fixed; /* Cover the whole screen */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -2062,13 +2225,13 @@ body.light-mode .announcement-detail-content {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    z-index: 2000; /* Ensure it's on top of everything */
-    background: linear-gradient(135deg, #87CEEB, #FFC0CB); /* Sky Blue to Pink Pastel Gradient */
-    color: #4C4C4C; /* Default text color for light pastel background */
+    z-index: 2000;
+    background: linear-gradient(135deg, #87CEEB, #FFC0CB);
+    color: #4C4C4C;
     transition: opacity 0.5s ease;
 }
 body.dark-mode #cover-view {
-    background: linear-gradient(135deg, #1A2A44, #4A2B68); /* Darker pastel gradient for dark mode */
+    background: linear-gradient(135deg, #1A2A44, #4A2B68);
     color: #E0BBE4;
 }
 
@@ -2081,12 +2244,13 @@ body.dark-mode #cover-view {
     font-family: 'Montserrat', sans-serif;
     font-weight: bold;
     font-size: 0.9em;
+    flex-shrink: 0; /* Pastikan tidak menyusut */
 }
 body.dark-mode .cover-top-bar {
-    color: #B8C6E6; /* Light blue-purple for dark mode date/time */
+    color: #B8C6E6;
 }
 body.light-mode .cover-top-bar {
-    color: #5D5D81; /* Muted blue-grey for light mode date/time */
+    color: #5D5D81;
 }
 
 .cover-content {
@@ -2094,47 +2258,49 @@ body.light-mode .cover-top-bar {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-grow: 1; /* Occupy vertical space */
+    flex-grow: 1; /* Pastikan mengisi ruang di tengah */
     padding: 20px;
     text-align: center;
+    box-sizing: border-box;
+    width: 100%; /* Penting untuk centering */
 }
 
 .welcome-text {
     font-family: 'Playfair Display', serif;
     font-size: 1.8em;
     margin-bottom: 10px;
-    color: #FF69B4; /* Hot Pink Pastel */
+    color: #FF69B4;
 }
 body.dark-mode .welcome-text {
-    color: #FFD700; /* Gold */
+    color: #FFD700;
 }
 
 .main-title {
-    font-family: 'Shantell Sans', cursive; /* Custom Font */
+    font-family: 'Shantell Sans', cursive;
     font-weight: 700;
     margin: 0;
     line-height: 0.8;
 }
 .main-title .xic {
-    font-size: 5em; /* Large */
-    color: #FFD700; /* Gold Pastel */
+    font-size: 5em;
+    color: #FFD700;
 }
 .main-title .web {
-    font-size: 2em; /* Smaller */
-    color: #7FFFD4; /* Aquamarine Pastel */
-    vertical-align: super; /* Raise it slightly */
+    font-size: 2em;
+    color: #7FFFD4;
+    vertical-align: super;
 }
 body.dark-mode .main-title .xic {
-    color: #FFD700; /* Gold */
+    color: #FFD700;
 }
 body.dark-mode .main-title .web {
-    color: #ADD8E6; /* Light Blue */
+    color: #ADD8E6;
 }
 body.light-mode .main-title .xic {
-    color: #FF8C00; /* Dark Orange */
+    color: #FF8C00;
 }
 body.light-mode .main-title .web {
-    color: #6495ED; /* Cornflower Blue */
+    color: #6495ED;
 }
 
 
@@ -2146,10 +2312,10 @@ body.light-mode .main-title .web {
     margin: 20px 0;
 }
 body.dark-mode .title-divider {
-    border-color: #9370DB; /* Medium Purple */
+    border-color: #9370DB;
 }
 body.light-mode .title-divider {
-    border-color: #B28DFF; /* Light Purple */
+    border-color: #B28DFF;
 }
 
 .credit-text {
@@ -2159,10 +2325,10 @@ body.light-mode .title-divider {
     margin-top: 0;
 }
 body.dark-mode .credit-text {
-    color: #DDA0DD; /* Plum */
+    color: #DDA0DD;
 }
 body.light-mode .credit-text {
-    color: #6A5ACD; /* Slate Blue */
+    color: #6A5ACD;
 }
 
 .cover-buttons-container {
@@ -2186,22 +2352,32 @@ body.light-mode .credit-text {
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease;
 }
 body.dark-mode .cover-button {
-    background: linear-gradient(145deg, #4A2B68, #351C5C); /* Darker purple gradient */
-    color: #FFD700; /* Gold */
+    background: linear-gradient(145deg, #4A2B68, #351C5C);
+    color: #FFD700;
 }
 body.dark-mode .cover-button:hover {
     background: linear-gradient(145deg, #5A3C78, #452C6C);
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.3);
 }
+body.dark-mode .cover-button:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    filter: brightness(0.8);
+}
 body.light-mode .cover-button {
-    background: linear-gradient(145deg, #ADD8E6, #87CEEB); /* Light blue gradient */
-    color: #4C4C4C; /* Dark gray */
+    background: linear-gradient(145deg, #ADD8E6, #87CEEB);
+    color: #4C4C4C;
 }
 body.light-mode .cover-button:hover {
     background: linear-gradient(145deg, #9ACFE0, #73BFE0);
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+body.light-mode .cover-button:active {
+    transform: translateY(0px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    filter: brightness(0.9);
 }
 
 
@@ -2212,12 +2388,330 @@ body.light-mode .cover-button:hover {
     box-sizing: border-box;
     opacity: 0.7;
     font-size: 0.8em;
+    flex-shrink: 0; /* Pastikan tidak menyusut */
 }
 body.dark-mode .cover-footer {
-    color: #B0C4DE; /* Light blue-grey */
+    color: #B0C4DE;
 }
 body.light-mode .cover-footer {
-    color: #6A6A6A; /* Grey */
+    color: #6A6A6A;
+}
+
+/* NEW: Credit View Specific Styles */
+#credit-view {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-grow: 1;
+    position: fixed; /* Penting agar tidak ada scrollbar di body utama saat ini aktif */
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(135deg, #87CEEB, #FFC0CB); /* Mirip dengan cover untuk transisi mulus */
+    color: #4C4C4C;
+    z-index: 2000;
+}
+body.dark-mode #credit-view {
+    background: linear-gradient(135deg, #1A2A44, #4A2B68);
+    color: #E0BBE4;
+}
+
+.credit-specific-top-bar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 15px 20px;
+    border-radius: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+body.dark-mode .credit-specific-top-bar {
+    background-color: #351C5C;
+    border-bottom: 1px solid #4B277C;
+}
+body.light-mode .credit-specific-top-bar {
+    background-color: #F0F0F0;
+    border-bottom: 1px solid #EAEAEA;
+}
+.credit-specific-top-bar .back-button {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1em;
+    transition: color 0.3s ease;
+}
+.credit-specific-top-bar .back-button i {
+    margin: 0 5px;
+    font-size: 1.2em;
+}
+body.dark-mode .credit-specific-top-bar .back-button {
+    color: #FFD700;
+}
+body.light-mode .credit-specific-top-bar .back-button {
+    color: #6A6A6A;
+}
+.credit-specific-top-bar .back-button:active {
+    filter: brightness(0.9);
+}
+
+.credit-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+}
+
+.credit-title {
+    font-family: 'Pacifico', cursive;
+    font-weight: 400;
+    font-size: 3em;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+body.dark-mode .credit-title {
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+body.light-mode .credit-title {
+    color: #8A2BE2;
+}
+
+.credit-divider {
+    width: 80%;
+    max-width: 400px;
+    border: none;
+    border-top: 2px solid;
+    margin: 15px 0 30px 0;
+}
+body.dark-mode .credit-divider {
+    border-color: #9370DB;
+}
+body.light-mode .credit-divider {
+    border-color: #B28DFF;
+}
+
+.credit-section {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 30px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+body.light-mode .credit-section {
+    background-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.credit-section h3 {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+body.dark-mode .credit-section h3 {
+    color: #ADD8E6;
+}
+body.light-mode .credit-section h3 {
+    color: #4682B4;
+}
+.credit-section h3 i {
+    font-size: 1.2em;
+    color: #FFD700;
+}
+body.light-mode .credit-section h3 i {
+    color: #B8860B;
+}
+
+/* REVISI: GAYA UNTUK TEKS DESKRIPSI (SUBTITLE) PENGEMBANG DAN NAMA PENGEMBANG */
+.credit-section p {
+    margin-bottom: 10px; /* Jaga margin bawah antar paragraf */
+}
+
+/* Bagian "Lead Developer:", "UI Designer:", dst. */
+.credit-section p strong {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700; /* Tebal untuk daya tarik */
+    font-size: 1.15em; /* Diperbesar sedikit agar lebih menonjol dari teks deskripsi biasa */
+    color: #FFD700; /* Warna kuning emas untuk spotlight */
+}
+body.light-mode .credit-section p strong {
+    color: #AA8B29; /* Warna kuning gelap yang menonjol di light mode */
+}
+
+/* Nama Pengembang (TARGET BARU) */
+.credit-section .developer-name {
+    font-family: 'Quicksand', sans-serif; /* Font non-formal profesional */
+    font-weight: 600; /* Sedikit lebih tebal dari teks normal, sedikit lebih tipis dari peran */
+    font-size: 1.1em; /* Ukuran font lebih besar, hampir sama dengan peran, agar menonjol */
+    color: #ADD8E6; /* Warna yang menyatu dengan tema dark mode, tapi tetap readable */
+}
+body.light-mode .credit-section .developer-name {
+    color: #7D4BA8; /* Warna ungu yang menonjol di light mode */
+}
+
+/* Gaya untuk isi deskripsi (selain strong dan developer-name) */
+.credit-section p, .credit-section ul, .credit-section li {
+    font-family: 'Quicksand', sans-serif; /* Font yang konsisten untuk body text */
+    font-weight: 500; /* Medium weight */
+    font-size: 0.95em; /* Ukuran yang rapi untuk teks detail */
+    line-height: 1.7; /* Jarak antar baris yang nyaman */
+}
+body.dark-mode .credit-section p, body.dark-mode .credit-section li {
+    color: #B8C6E6; /* Warna biru-abu muda yang profesional di dark mode */
+}
+body.light-mode .credit-section p, body.light-mode .credit-section li {
+    color: #4C4C4C; /* Tetap warna dark grey di light mode */
+}
+
+
+.credit-section ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+.credit-section li:before {
+    content: "\2022";
+    color: #FFD700;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+body.light-mode .credit-section li:before {
+    color: #B8860B;
+}
+
+
+/* REVISI: Gaya untuk Catatan Lisensi */
+.credit-section.license p { /* Target spesifik untuk paragraf di catatan lisensi */
+    font-family: 'Montserrat', sans-serif; /* Mengubah font ke Montserrat untuk keterbacaan yang lebih baik pada teks panjang */
+    font-weight: 400; /* Normal weight */
+    font-size: 1em; /* Dulu 0.95em, diperbesar ke 1em agar lebih nyaman untuk blok teks panjang */
+    line-height: 1.8; /* Lebih renggang untuk kenyamanan membaca blok teks panjang */
+    text-align: justify; /* Justify teks untuk tampilan yang lebih rapi dan formal */
+}
+body.dark-mode .credit-section.license p {
+    color: #ADD8E6; /* Warna biru muda yang bersih di dark mode */
+}
+body.light-mode .credit-section.license p {
+    color: #555555; /* Sedikit lebih gelap dari warna default untuk kontras */
+}
+
+
+.credit-footer {
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    box-sizing: border-box;
+    opacity: 0.7;
+    font-size: 0.8em;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+body.dark-mode .credit-footer {
+    color: #B0C4DE;
+}
+body.light-mode .credit-footer {
+    color: #6A6A6A;
+}
+
+/* Snackbar Styling */
+.snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 10000;
+    left: 50%;
+    bottom: 30px;
+    font-size: 1em;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transform: translateY(50px);
+    opacity: 0;
+    transition: visibility 0s, transform 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+.snackbar.show {
+    visibility: visible;
+    transform: translateY(0);
+    opacity: 1;
+}
+body.light-mode .snackbar {
+    background-color: #F0F0F0;
+    color: #4C4C4C;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.snackbar.success {
+    background-color: #4CAF50;
+}
+.snackbar.error {
+    background-color: #f44336;
+}
+.snackbar.info {
+    background-color: #2196F3;
+}
+
+/* Confirm Delete Modal Styles */
+.modal-content.small-modal {
+    max-width: 350px;
+    text-align: center;
+}
+.modal-content.small-modal .modal-body {
+    padding: 20px;
+    gap: 20px;
+}
+.modal-content.small-modal .confirm-buttons {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    margin-top: 15px;
+}
+.modal-content.small-modal .confirm-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.modal-content.small-modal .confirm-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.modal-content.small-modal .confirm-button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.modal-content.small-modal .cancel-button {
+    background-color: #999;
+    color: white;
+}
+.modal-content.small-modal .cancel-button:hover {
+    background-color: #888;
+}
+.modal-content.small-modal .delete-button {
+    background-color: #f44336;
+    color: white;
+}
+.modal-content.small-modal .delete-button:hover {
+    background-color: #e53935;
 }
 
 
@@ -2260,7 +2754,8 @@ body.light-mode .cover-footer {
     .teacher-content,
     .student-content,
     .announcement-content,
-    .add-announcement-content {
+    .add-announcement-content,
+    .credit-content {
         padding-left: 15px;
         padding-right: 15px;
     }
@@ -2306,7 +2801,8 @@ body.light-mode .cover-footer {
     .login-title,
     .student-title,
     .announcement-title,
-    .add-announcement-title {
+    .add-announcement-title,
+    .credit-title { /* Tambahkan credit-title */
         font-size: 1.8em;
     }
 
@@ -2372,12 +2868,12 @@ body.light-mode .cover-footer {
         width: 25%;
     }
     .student-table th:nth-child(4),
-    .student-table td:nth-child(4),
+    .student-table td:nth-child(4) { width: 25%; padding-left: 5px; }
     .announcement-table th:nth-child(4),
-    .announcement-table td:nth-child(4) {
-        width: 25%;
-        padding-left: 5px;
-    }
+    .announcement-table td:nth-child(4) { width: 20%; }
+    .announcement-table th:nth-child(5),
+    .announcement-table td:nth-child(5) { width: 10%; }
+
 
     .add-announcement-button-container {
         padding-right: 15px;
@@ -2420,5 +2916,27 @@ body.light-mode .cover-footer {
     #cover-view .cover-footer {
         padding: 10px;
         font-size: 0.7em;
+    }
+
+    /* Credit View Responsive */
+    .credit-content {
+        padding: 15px;
+    }
+    .credit-title {
+        font-size: 2.5em;
+    }
+    .credit-divider {
+        margin: 10px 0 20px 0;
+    }
+    .credit-section {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    .credit-section h3 {
+        font-size: 1.3em;
+        margin-bottom: 10px;
+    }
+    .credit-section p, .credit-section ul, .credit-section li {
+        font-size: 0.9em;
     }
 }
