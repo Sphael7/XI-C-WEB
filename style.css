@@ -35,8 +35,8 @@ body {
 .other-content,
 .teacher-content,
 .student-content,
-.announcement-content,
-.add-announcement-content,
+.task-content, /* Diubah dari announcement-content */
+.add-task-content, /* Diubah dari add-announcement-content */
 .credit-content { /* Tambahkan credit-content */
     padding-left: 20px;
     padding-right: 20px;
@@ -69,8 +69,8 @@ body {
 .other-content,
 .teacher-content,
 .student-content,
-.announcement-content,
-.add-announcement-content,
+.task-content, /* Diubah dari announcement-content */
+.add-task-content, /* Diubah dari add-announcement-content */
 .credit-content { /* Pastikan konten utama di setiap view bisa menggulir dan tidak memanjang kosong */
     flex-grow: 1;
     overflow-y: auto; /* Memungkinkan konten menggulir */
@@ -88,16 +88,16 @@ body {
     flex-grow: 1;
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Default transition */
     position: relative; /* Agar z-index bekerja untuk tumpukan view */
     z-index: 1;
 }
 
 .hidden-view {
-    display: none; /* Awalnya display: none */
+    display: none;
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+    transition: opacity 0.5s ease-in, transform 0.5s ease-in; /* Default transition */
     pointer-events: none;
     position: absolute; /* Agar tidak memakan ruang saat hidden */
     top: 0;
@@ -123,7 +123,8 @@ body {
 .view-entering.active-view { /* Saat transisi masuk aktif */
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    /* Transisi sebenarnya diatur di JS berdasarkan fastTransition */
+    /* transition: opacity 0.5s ease-out, transform 0.5s ease-out; */ 
     position: relative; /* Kembali ke relative setelah transisi masuk */
 }
 
@@ -132,7 +133,8 @@ body {
     opacity: 0;
     transform: translateY(-20px);
     pointer-events: none;
-    transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+    /* Transisi sebenarnya diatur di JS berdasarkan fastTransition */
+    /* transition: opacity 0.5s ease-in, transform 0.5s ease-in; */
 }
 
 
@@ -1848,8 +1850,8 @@ body.light-mode .student-table tbody tr:hover {
     text-overflow: clip;
 }
 
-/* Announcement View Styles */
-.announcement-content {
+/* Task View Styles (Diubah dari Announcement View Styles) */
+.task-content {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1857,7 +1859,7 @@ body.light-mode .student-table tbody tr:hover {
     padding-bottom: 20px;
 }
 
-.announcement-title {
+.task-title {
     font-family: 'Playfair Display', serif;
     font-weight: 700;
     font-size: 2.2em;
@@ -1865,14 +1867,14 @@ body.light-mode .student-table tbody tr:hover {
     margin-top: 0;
     margin-bottom: 20px;
 }
-body.dark-mode .announcement-title {
+body.dark-mode .task-title {
     color: #92A8D1;
 }
-body.light-mode .announcement-title {
+body.light-mode .task-title {
     color: #4C4C4C;
 }
 
-.announcement-table-container {
+.task-table-container {
     width: 100%;
     max-width: 650px;
     flex-grow: 1;
@@ -1882,16 +1884,16 @@ body.light-mode .announcement-title {
     display: flex;
     flex-direction: column;
 }
-body.dark-mode .announcement-table-container {
+body.dark-mode .task-table-container {
     background-color: #2D2A4B;
     border: 1px solid #4A4670;
 }
-body.light-mode .announcement-table-container {
+body.light-mode .task-table-container {
     background-color: #E8E0EE;
     border: 1px solid #D1BBDE;
 }
 
-.announcement-table {
+.task-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -1899,105 +1901,105 @@ body.light-mode .announcement-table-container {
     color: inherit;
 }
 
-.announcement-table thead {
+.task-table thead {
     position: sticky;
     top: 0;
     z-index: 1;
 }
-body.dark-mode .announcement-table thead {
+body.dark-mode .task-table thead {
     background-color: #3F3C6D;
     color: #B8C6E6;
 }
-body.light-mode .announcement-table thead {
+body.light-mode .task-table thead {
     background-color: #CDC3DC;
     color: #4C4C4C;
 }
 
-.announcement-table th {
+.task-table th {
     padding: 12px 8px;
     text-align: center;
     font-weight: 600;
     border-bottom: 1px solid;
     border-right: 1px solid;
 }
-body.dark-mode .announcement-table th {
+body.dark-mode .task-table th {
     border-color: #4A4670;
 }
-body.light-mode .announcement-table th {
+body.light-mode .task-table th {
     border-color: #D1BBDE;
 }
 
-.announcement-table th:first-child { border-top-left-radius: 15px; }
-.announcement-table th:last-child { border-top-right-radius: 15px; border-right: none; }
+.task-table th:first-child { border-top-left-radius: 15px; }
+.task-table th:last-child { border-top-right-radius: 15px; border-right: none; }
 
-.announcement-table td {
+.task-table td {
     padding: 10px 8px;
     text-align: center;
     border-bottom: 1px solid;
     border-right: 1px solid;
 }
-body.dark-mode .announcement-table td {
+body.dark-mode .task-table td {
     border-color: #3F3C6D;
     color: #E0BBE4;
 }
-body.light-mode .announcement-table td {
+body.light-mode .task-table td {
     border-color: #D1BBDE;
     color: #4C4C4C;
 }
 
-.announcement-table td:last-child { border-right: none; }
-.announcement-table tr:last-child td { border-bottom: none; }
+.task-table td:last-child { border-right: none; }
+.task-table tr:last-child td { border-bottom: none; }
 
-body.dark-mode .announcement-table tbody tr:nth-child(odd) {
+body.dark-mode .task-table tbody tr:nth-child(odd) {
     background-color: #2D2A4B;
 }
-body.dark-mode .announcement-table tbody tr:nth-child(even) {
+body.dark-mode .task-table tbody tr:nth-child(even) {
     background-color: #25223C;
 }
-body.light-mode .announcement-table tbody tr:nth-child(odd) {
+body.light-mode .task-table tbody tr:nth-child(odd) {
     background-color: #F0F0F0;
 }
-body.light-mode .announcement-table tbody tr:nth-child(even) {
+body.light-mode .task-table tbody tr:nth-child(even) {
     background-color: #E8E0EE;
 }
 
-.announcement-table tbody tr:hover {
+.task-table tbody tr:hover {
     transform: scale(1.005);
     box-shadow: 0 0 6px rgba(0,0,0,0.1);
     cursor: pointer;
 }
-body.dark-mode .announcement-table tbody tr:hover {
+body.dark-mode .task-table tbody tr:hover {
     background-color: #3D3960;
     box-shadow: 0 0 6px rgba(0,0,0,0.3);
 }
-body.light-mode .announcement-table tbody tr:hover {
+body.light-mode .task-table tbody tr:hover {
     background-color: #E0CEE8;
     box-shadow: 0 0 6px rgba(0,0,0,0.05);
 }
 
-.announcement-table th:nth-child(1), .announcement-table td:nth-child(1) { width: 8%; }
-.announcement-table th:nth-child(2), .announcement-table td:nth-child(2) { width: 30%; text-align: left; padding-left: 10px;}
-.announcement-table th:nth-child(3), .announcement-table td:nth-child(3) { width: 25%; text-align: left; padding-left: 10px;}
-.announcement-table th:nth-child(4), .announcement-table td:nth-child(4) { width: 25%; }
-.announcement-table th:nth-child(5), .announcement-table td:nth-child(5) { width: 12%; } /* Kolom Aksi */
+.task-table th:nth-child(1), .task-table td:nth-child(1) { width: 8%; }
+.task-table th:nth-child(2), .task-table td:nth-child(2) { width: 28%; text-align: left; padding-left: 10px;}
+.task-table th:nth-child(3), .task-table td:nth-child(3) { width: 22%; text-align: left; padding-left: 10px;}
+.task-table th:nth-child(4), .task-table td:nth-child(4) { width: 22%; }
+.task-table th:nth-child(5), .task-table td:nth-child(5) { width: 20%; }
 
 
-.announcement-table td:nth-child(2),
-.announcement-table td:nth-child(3),
-.announcement-table td:nth-child(4) {
+.task-table td:nth-child(2),
+.task-table td:nth-child(3),
+.task-table td:nth-child(4) {
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
 }
 
-/* Gaya untuk tombol Aksi di tabel pengumuman */
-.announcement-table .action-buttons {
+/* Gaya untuk tombol Aksi di tabel tugas */
+.task-table .action-buttons {
     display: flex;
     justify-content: center;
     gap: 8px;
 }
 
-.announcement-table .action-button {
+.task-table .action-button {
     font-size: 1.1em;
     cursor: pointer;
     background: none;
@@ -2006,60 +2008,60 @@ body.light-mode .announcement-table tbody tr:hover {
     border-radius: 5px;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
-.announcement-table .action-button:hover {
+.task-table .action-button:hover {
     filter: brightness(1.2);
 }
-.announcement-table .action-button:active {
+.task-table .action-button:active {
     transform: translateY(1px);
 }
 
-.announcement-table .edit-button {
+.task-table .edit-button {
     color: #00BFFF;
 }
-body.dark-mode .announcement-table .edit-button {
+body.dark-mode .task-table .edit-button {
     color: #4CAF50;
 }
-body.light-mode .announcement-table .edit-button {
+body.light-mode .task-table .edit-button {
     color: #4CAF50;
 }
-.announcement-table .edit-button:hover {
+.task-table .edit-button:hover {
     background-color: rgba(76, 175, 80, 0.2);
 }
 
-.announcement-table .delete-button {
+.task-table .delete-button {
     color: #FF6347;
 }
-body.dark-mode .announcement-table .delete-button {
+body.dark-mode .task-table .delete-button {
     color: #f44336;
 }
-body.light-mode .announcement-table .delete-button {
+body.light-mode .task-table .delete-button {
     color: #f44336;
 }
-.announcement-table .delete-button:hover {
+.task-table .delete-button:hover {
     background-color: rgba(244, 67, 54, 0.2);
 }
 
 
-.announcement-table .view-details-link {
+.task-table .view-details-link {
     font-weight: bold;
     color: #FFD700;
     text-decoration: none;
     cursor: pointer;
     transition: color 0.2s ease;
 }
-body.light-mode .announcement-table .view-details-link {
+body.light-mode .task-table .view-details-link {
     color: #7D4BA8;
 }
-.announcement-table .view-details-link:hover {
+.task-table .view-details-link:hover {
     text-decoration: underline;
 }
 
-.announcement-pagination-controls {
+.task-pagination-controls {
     margin-top: 20px;
     padding-bottom: 20px;
 }
 
-.add-announcement-button-container {
+.add-task-button-container {
     width: 100%;
     display: flex;
     justify-content: flex-end;
@@ -2068,7 +2070,7 @@ body.light-mode .announcement-table .view-details-link {
     box-sizing: border-box;
 }
 
-.add-announcement-button {
+.add-task-button {
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -2081,26 +2083,26 @@ body.light-mode .announcement-table .view-details-link {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-body.dark-mode .add-announcement-button {
+body.dark-mode .add-task-button {
     background: linear-gradient(145deg, #FFD700, #FFA500);
     color: #333;
 }
-body.light-mode .add-announcement-button {
+body.light-mode .add-task-button {
     background: linear-gradient(145deg, #EFE0F5, #D1BBDE);
     color: #7D4BA8;
 }
-.add-announcement-button:hover {
+.add-task-button:hover {
     transform: translateY(-3px) scale(1.05);
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
 }
-.add-announcement-button:active {
+.add-task-button:active {
     transform: translateY(0px) scale(1);
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     filter: brightness(0.9);
 }
 
-/* Manage Announcement View Styles (Sebelumnya Add Announcement View) */
-.add-announcement-specific-top-bar {
+/* Manage Task View Styles */
+.add-task-specific-top-bar {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -2108,33 +2110,33 @@ body.light-mode .add-announcement-button {
     border-radius: 0;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
-body.dark-mode .add-announcement-specific-top-bar {
+body.dark-mode .add-task-specific-top-bar {
     background-color: #351C5C;
     border-bottom: 1px solid #4B277C;
 }
-body.light-mode .add-announcement-specific-top-bar {
+body.light-mode .add-task-specific-top-bar {
     background-color: #F0F0F0;
     border-bottom: 1px solid #EAEAEA;
 }
-.add-announcement-specific-top-bar .back-button {
+.add-task-specific-top-bar .back-button {
     display: flex;
     align-items: center;
     cursor: pointer;
     font-size: 1em;
     transition: color 0.3s ease;
 }
-.add-announcement-specific-top-bar .back-button i {
+.add-task-specific-top-bar .back-button i {
     margin: 0 5px;
     font-size: 1.2em;
 }
-body.dark-mode .add-announcement-specific-top-bar .back-button {
+body.dark-mode .add-task-specific-top-bar .back-button {
     color: #FFD700;
 }
-body.light-mode .add-announcement-specific-top-bar .back-button {
+body.light-mode .add-task-specific-top-bar .back-button {
     color: #6A6A6A;
 }
 
-.add-announcement-content {
+.add-task-content {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2143,7 +2145,7 @@ body.light-mode .add-announcement-specific-top-bar .back-button {
     padding-bottom: 20px;
 }
 
-.add-announcement-title {
+.add-task-title {
     font-family: 'Playfair Display', serif;
     font-weight: 700;
     font-size: 2.2em;
@@ -2151,10 +2153,10 @@ body.light-mode .add-announcement-specific-top-bar .back-button {
     margin-top: 0;
     margin-bottom: 20px;
 }
-body.dark-mode .add-announcement-title {
+body.dark-mode .add-task-title {
     color: #B8C6E6;
 }
-body.light-mode .add-announcement-title {
+body.light-mode .add-task-title {
     color: #4C4C4C;
 }
 
@@ -2189,20 +2191,20 @@ body.light-mode .publish-button {
     filter: brightness(0.9);
 }
 
-/* Announcement Detail Modal Specific Styles */
-.announcement-detail-modal-body {
+/* Task Detail Modal Specific Styles */
+.task-detail-modal-body {
     display: block;
     text-align: left;
     line-height: 1.6;
 }
-.announcement-detail-modal-body p {
+.task-detail-modal-body p {
     margin-bottom: 8px;
 }
-.announcement-detail-modal-body strong {
+.task-detail-modal-body strong {
     min-width: 90px;
     display: inline-block;
 }
-.announcement-detail-content {
+.task-detail-content {
     margin-top: 15px;
     padding-top: 15px;
     border-top: 1px solid rgba(255,255,255,0.1);
@@ -2210,7 +2212,7 @@ body.light-mode .publish-button {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
-body.light-mode .announcement-detail-content {
+body.light-mode .task-detail-content {
     border-top: 1px solid rgba(0,0,0,0.08);
 }
 
@@ -2753,8 +2755,8 @@ body.light-mode .snackbar {
     .other-content,
     .teacher-content,
     .student-content,
-    .announcement-content,
-    .add-announcement-content,
+    .task-content, /* Diubah dari announcement-content */
+    .add-task-content, /* Diubah dari add-announcement-content */
     .credit-content {
         padding-left: 15px;
         padding-right: 15px;
@@ -2800,8 +2802,8 @@ body.light-mode .snackbar {
     .profile-title,
     .login-title,
     .student-title,
-    .announcement-title,
-    .add-announcement-title,
+    .task-title, /* Diubah dari announcement-title */
+    .add-task-title, /* Diubah dari add-announcement-title */
     .credit-title { /* Tambahkan credit-title */
         font-size: 1.8em;
     }
@@ -2839,7 +2841,7 @@ body.light-mode .snackbar {
 
     .teacher-modal-table th, .teacher-modal-table td,
     .student-table th, .student-table td,
-    .announcement-table th, .announcement-table td {
+    .task-table th, .task-table td { /* Diubah dari announcement-table */
         padding: 8px 5px;
         font-size: 0.8em;
     }
@@ -2847,44 +2849,44 @@ body.light-mode .snackbar {
     .teacher-modal-table td:nth-child(1),
     .student-table th:nth-child(1),
     .student-table td:nth-child(1),
-    .announcement-table th:nth-child(1),
-    .announcement-table td:nth-child(1) {
+    .task-table th:nth-child(1), /* Diubah dari announcement-table */
+    .task-table td:nth-child(1) { /* Diubah dari announcement-table */
         width: 15%;
     }
     .teacher-modal-table th:nth-child(2),
     .teacher-modal-table td:nth-child(2),
     .student-table th:nth-child(2),
     .student-table td:nth-child(2),
-    .announcement-table th:nth-child(2),
-    .announcement-table td:nth-child(2) {
+    .task-table th:nth-child(2), /* Diubah dari announcement-table */
+    .task-table td:nth-child(2) { /* Diubah dari announcement-table */
         width: 35%;
     }
     .teacher-modal-table th:nth-child(3),
     .teacher-modal-table td:nth-child(3),
     .student-table th:nth-child(3),
     .student-table td:nth-child(3),
-    .announcement-table th:nth-child(3),
-    .announcement-table td:nth-child(3) {
+    .task-table th:nth-child(3), /* Diubah dari announcement-table */
+    .task-table td:nth-child(3) { /* Diubah dari announcement-table */
         width: 25%;
     }
     .student-table th:nth-child(4),
     .student-table td:nth-child(4) { width: 25%; padding-left: 5px; }
-    .announcement-table th:nth-child(4),
-    .announcement-table td:nth-child(4) { width: 20%; }
-    .announcement-table th:nth-child(5),
-    .announcement-table td:nth-child(5) { width: 10%; }
+    .task-table th:nth-child(4), /* Diubah dari announcement-table */
+    .task-table td:nth-child(4) { width: 20%; } /* Diubah dari announcement-table */
+    .task-table th:nth-child(5), /* Diubah dari announcement-table */
+    .task-table td:nth-child(5) { width: 10%; } /* Diubah dari announcement-table */
 
 
-    .add-announcement-button-container {
+    .add-task-button-container { /* Diubah dari add-announcement-button-container */
         padding-right: 15px;
     }
-    .add-announcement-button {
+    .add-task-button { /* Diubah dari add-announcement-button */
         width: 50px;
         height: 50px;
         font-size: 1.8em;
     }
 
-    .announcement-detail-modal-body p {
+    .task-detail-modal-body p { /* Diubah dari announcement-detail-modal-body */
         font-size: 0.9em;
     }
 
@@ -2901,9 +2903,10 @@ body.light-mode .snackbar {
     #cover-view .credit-text {
         font-size: 1em;
     }
-    #cover-view .cover-buttons-container {
+    .cover-buttons-container { /* Diubah untuk menyesuaikan tombol Settings yang dihapus */
         gap: 10px;
         max-width: 200px;
+        /* Jika hanya ada 2 tombol, mungkin justify-content: center atau align-items: center */
     }
     #cover-view .cover-button {
         padding: 12px 20px;
