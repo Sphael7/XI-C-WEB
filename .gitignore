@@ -1,0 +1,21 @@
+# Node.js
+/backend/node_modules
+/backend/.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+
+# Frontend specific (if any)
+/public/node_modules # if you use npm/yarn in public folder
+/public/.env # if you have .env in public, which you shouldn't for prod
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDE specific files
+.vscode/
+.idea/
+*.iml
