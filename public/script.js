@@ -1,13 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const modeToggle = document.getElementById('mode-toggle');
+    const backendUrl = 'http://localhost:3000';
+
     const body = document.body;
-    const modeIcon = modeToggle.querySelector('.mode-icon');
+    const modeToggle = document.getElementById('mode-toggle');
+    const themeButtons = document.querySelectorAll('.theme-button');
+    
+    const themes = ['theme-1', 'theme-2', 'theme-3', 'theme-4', 'theme-5', 'theme-6']; // Added theme-6
+    const themeNames = {
+        'theme-1': 'Noble Theme',
+        'theme-2': 'Light Theme',
+        'theme-3': 'Forest Theme',
+        'theme-4': 'German Theme',
+        'theme-5': 'Beach Theme',
+        'theme-6': 'Sunset Theme' // Added theme-6 name
+    };
+    let currentTheme = 'theme-1';
+
     const currentDateElement = document.getElementById('current-date');
 
     const globalTopBar = document.getElementById('global-top-bar');
-    const headerSearchSection = globalTopBar.querySelector('.search-section');
-    const headerSearchInput = globalTopBar.querySelector('.search-input');
-    const headerModeToggle = globalTopBar.querySelector('.mode-toggle');
+    const globalSearchInput = document.getElementById('global-search-input');
+
+    const searchFilterButton = document.getElementById('search-filter-button');
+    const currentSearchFilterDisplay = document.getElementById('current-search-filter');
+    const searchFilterDropdownContent = document.getElementById('search-filter-dropdown-content');
+    let currentSearchFilter = 'teacher';
 
     const mainView = document.getElementById('main-view');
     const jadwalView = document.getElementById('jadwal-view');
@@ -24,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const jadwalBox = document.getElementById('jadwal-box');
     const studentBox = document.getElementById('student-box');
-    const othersBox = document.getElementById('others-box');
+    const ebookBox = document.getElementById('ebook-box');
     const teacherBox = document.getElementById('teacher-box');
     const taskBox = document.getElementById('task-main-box');
     const settingsButtonFooter = document.getElementById('settings-button-footer-main');
@@ -38,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextDayArrow = document.getElementById('next-day');
     const jadwalList = document.getElementById('jadwal-list');
     const jadwalSearchInput = document.getElementById('jadwal-search-input');
+    const jadwalLoadingOverlay = document.getElementById('jadwal-loading-overlay'); // New
     const days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
     let currentDayIndex = 0;
 
@@ -70,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const realTimeWIB = document.getElementById('real-time-wib');
 
     const subjectGridContainer = teacherView.querySelector('.subject-grid-container');
+    const teacherLoadingOverlay = document.getElementById('teacher-loading-overlay'); // New
     const prevSubjectPageArrow = document.getElementById('prev-subject-page');
     const nextSubjectPageArrow = document.getElementById('next-subject-page');
     const currentPageDisplay = document.getElementById('current-page-display');
@@ -81,11 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeTeacherModalButton = document.getElementById('close-teacher-modal');
 
     const searchResultsModalOverlay = document.getElementById('search-results-modal-overlay');
-    const searchResultsTeacherTableBody = document.getElementById('search-results-teacher-table-body');
+    const searchResultsModalTitle = document.getElementById('search-results-modal-title');
+    const searchResultsTableContainer = document.getElementById('search-results-table-container');
     const closeSearchModalButton = document.getElementById('close-search-modal');
     const noSearchResultsMessage = document.getElementById('no-search-results-message');
 
     const studentTableBody = document.getElementById('student-table-body');
+    const studentLoadingOverlay = document.getElementById('student-loading-overlay'); // New
     const studentSearchInput = document.getElementById('student-search-input');
     const prevStudentPageArrow = document.getElementById('prev-student-page');
     const nextStudentPageArrow = document.getElementById('next-student-page');
@@ -93,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalStudentPagesDisplay = document.getElementById('total-student-pages-display');
 
     const taskTableBody = document.getElementById('task-table-body');
+    const taskLoadingOverlay = document.getElementById('task-loading-overlay'); // New
     const prevTaskPageArrow = document.getElementById('prev-task-page');
     const nextTaskPageArrow = document.getElementById('next-task-page');
     const currentTaskPageDisplay = document.getElementById('current-task-page-display');
@@ -130,8 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const snackbar = document.getElementById('snackbar');
 
-    const deleteConfirmModalOverlay = document.getElementById('delete-confirm-modal-overlay');
-
     const passwordConfirmModalOverlay = document.getElementById('password-confirm-modal-overlay');
     const closePasswordConfirmModal = document.getElementById('close-password-confirm-modal');
     const passwordInput = document.getElementById('password-input');
@@ -142,20 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteTaskFromDetailButton = document.getElementById('delete-task-from-detail-button');
     let taskToDeleteId = null;
 
-    // NEW: Elemen dan variabel untuk E-book (Cloudinary)
-    const ebookBox = document.getElementById('ebook-box');
-    const ebookListContainer = document.getElementById('ebook-list-container');
-    const addEbookButton = document.getElementById('add-ebook-button');
-    // Input file tersembunyi yang akan dipicu oleh tombol addEbookButton
-    const ebookUploadInput = document.createElement('input');
-    ebookUploadInput.type = 'file';
-    ebookUploadInput.id = 'ebook-upload-input';
-    ebookUploadInput.accept = '.pdf,.epub,.docx,.txt'; // Batasi tipe file yang diizinkan
-    ebookUploadInput.style.display = 'none'; // Sembunyikan input file
-    document.body.appendChild(ebookUploadInput); // Tambahkan ke body
-
-    let ebookList = JSON.parse(localStorage.getItem('ebookList')) || [];
-
+    let taskData = [];
 
     let currentUserProfile = {
         nama: "Belum diisi",
@@ -166,51 +173,17 @@ document.addEventListener('DOMContentLoaded', () => {
         photo: "https://via.placeholder.com/100"
     };
 
-    let currentActiveView = null; // Track the currently active view element
-
-    const jadwalData = {
-        "Senin": [
-            { jam: "1-2", mapel: "PJOK", guru: "Pak Bagas" },
-            { jam: "3-4", mapel: "MTK", guru: "Bu Suci/Fitri" },
-            { jam: "5-6", mapel: "TIK", guru: "Pak Ojo" },
-            { jam: "7-9", mapel: "Kimia", guru: "Bu Rossy" }
-        ],
-        "Selasa": [
-            { jam: "1-3", mapel: "TIK", guru: "Pak Ojo" },
-            { jam: "4-6", mapel: "MTK", guru: "Pak Wawan" },
-            { jam: "7-8", mapel: "B.Indo", guru: "Bu Niken" },
-            { jam: "9-10", mapel: "PKWU", guru: "Bu Eva" }
-        ],
-        "Rabu": [
-            { jam: "1-2", mapel: "Agama", guru: "Bu Rumada dan Pak Abdul Salim" },
-            { jam: "3", mapel: "BK", guru: "Pak Tris" },
-            { jam: "4-6", mapel: "B.Ing", guru: "Pak Fajar" },
-            { jam: "7", mapel: "Agama", guru: "Bu Rum, Pak Abdul Salim" },
-            { jam: "8-10", mapel: "Fisika", guru: "Bu Ida" }
-        ],
-        "Kamis": [
-            { jam: "1-2", mapel: "B.Indo", guru: "Bu Niken" },
-            { jam: "3-4", mapel: "MTK", guru: "Pak Wawan" },
-            { jam: "5-6", mapel: "Sejarah", guru: "Pak Ari" },
-            { jam: "7-8", mapel: "PKN", guru: "Bu Icha" },
-            { jam: "9-10", mapel: "MTK", guru: "Bu Fitri/Suci" }
-        ],
-        "Jumat": [
-            { jam: "1-2", mapel: "SenBud", guru: "Pak Reza" },
-            { jam: "3-4", mapel: "Fisika", guru: "Bu Ida" },
-            { jam: "5-6", mapel: "Kimia", guru: "Bu Rossy" }
-        ]
-    };
+    let currentActiveView = null;
 
     const rawTeacherData = [
         { kode: "A1", nama: "MUSLICHA, M.Pd.", mapel: "PPKN" },
         { kode: "A2", nama: "BIBIT PURWANTINI, M.Pd.", mapel: "PPKN" },
-        { kode: "B0", nama: "Drs. UBAIDILLAH, M.Pd. PEND. AGAMA ISLAM", mapel: "PEND. AGAMA" },
-        { kode: "B1", nama: "RUMADA, S.PAK., M.Pd. PEND. AGAMA KRISTEN", mapel: "PEND. AGAMA" },
-        { kode: "B2", nama: "HENNY BIBINUR BANIAH, M.Pd.", mapel: "PEND. AGAMA" },
-        { kode: "B3", nama: "SAIFUDIN, S.SI, M.Pd.", mapel: "PEND. AGAMA" },
-        { kode: "B4", nama: "ABDUL SALIM, M.Pd.", mapel: "PEND. AGAMA" },
-        { kode: "B5", nama: "OKTAVIANUS, S.S. PEND. AGAMA KATOLIK", mapel: "PEND. AGAMA" },
+        { kode: "B0", nama: "Drs. UBAIDILLAH, M.Pd.", mapel: "PEND. AGAMA ISLAM" },
+        { kode: "B1", nama: "RUMADA, S.PAK., M.Pd.", mapel: "PEND. AGAMA KRISTEN" },
+        { kode: "B2", nama: "HENNY BINBUR BANIAH, M.Pd.", mapel: "PEND. AGAMA KRISTEN" },
+        { kode: "B3", nama: "SAIFUDIN, S.Si, M.Pd.", mapel: "PEND. AGAMA ISLAM" },
+        { kode: "B4", nama: "ABDUL SALIM, M.Pd.", mapel: "PEND. AGAMA ISLAM" },
+        { kode: "B5", nama: "OKTAVIANUS, S.S.", mapel: "PEND. AGAMA KATOLIK" },
         { kode: "C1", nama: "H. EDY PRAMONO, S.Pd.", mapel: "BAHASA INDONESIA" },
         { kode: "C2", nama: "NURSITI KAMSIATI, S.Pd.", mapel: "BAHASA INDONESIA" },
         { kode: "C3", nama: "ROULINA PURBA, S.Pd", mapel: "BAHASA INDONESIA" },
@@ -266,6 +239,63 @@ document.addEventListener('DOMContentLoaded', () => {
         { kode: "PK4", nama: "HIDAYATUN NIKMAH, S.Pd.", mapel: "PKWU" },
         { kode: "PK5", nama: "ROSSY LANASARI, S.Pd", mapel: "PKWU" }
     ];
+
+    function getTeacherName(searchTerm, mapel = null) {
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+        let foundTeachers = rawTeacherData.filter(teacher =>
+            teacher.nama.toLowerCase().includes(lowerCaseSearchTerm) ||
+            teacher.kode.toLowerCase().includes(lowerCaseSearchTerm)
+        );
+
+        if (mapel) {
+            const lowerCaseMapel = mapel.toLowerCase();
+            const teachersInSubject = foundTeachers.filter(teacher =>
+                teacher.mapel.toLowerCase().includes(lowerCaseMapel)
+            );
+            if (teachersInSubject.length > 0) {
+                return teachersInSubject.map(t => t.nama).join(' / ');
+            }
+        }
+        
+        if (foundTeachers.length > 0) {
+            return foundTeachers.map(t => t.nama).join(' / ');
+        }
+        return searchTerm;
+    }
+
+    const jadwalData = {
+        "Senin": [
+            { jam: "1-2", mapel: "PJOK", guru: getTeacherName("Bagus", "PJOK") },
+            { jam: "3-4", mapel: "MATEMATIKA", guru: `${getTeacherName("Suci", "MATEMATIKA")} / ${getTeacherName("Fitria", "MATEMATIKA")}` },
+            { jam: "5-6", mapel: "INFORMATIKA", guru: getTeacherName("Prasojo", "INFORMATIKA") },
+            { jam: "7-9", mapel: "KIMIA", guru: getTeacherName("Rossy", "KIMIA") }
+        ],
+        "Selasa": [
+            { jam: "1-3", mapel: "INFORMATIKA", guru: getTeacherName("Prasojo", "INFORMATIKA") },
+            { jam: "4-6", mapel: "MATEMATIKA", guru: getTeacherName("Wawan", "MATEMATIKA") },
+            { jam: "7-8", mapel: "BAHASA INDONESIA", guru: getTeacherName("Niken", "BAHASA INDONESIA") },
+            { jam: "9-10", mapel: "PKWU", guru: getTeacherName("Eva", "PKWU") }
+        ],
+        "Rabu": [
+            { jam: "1-2", mapel: "PENDIDIKAN AGAMA KRISTEN", guru: `${getTeacherName("Rumada", "PEND. AGAMA KRISTEN")} dan ${getTeacherName("Abdul Salim", "PEND. AGAMA ISLAM")}` },
+            { jam: "3", mapel: "BIMBINGAN KONSELING", guru: getTeacherName("Muhammad Sutrisno", "BIMBINGAN KONSELING") },
+            { jam: "4-6", mapel: "BAHASA INGGRIS", guru: getTeacherName("Fajar", "BAHASA INGGRIS") },
+            { jam: "7", mapel: "PENDIDIKAN AGAMA KRISTEN", guru: `${getTeacherName("Rumada", "PEND. AGAMA KRISTEN")}, ${getTeacherName("Abdul Salim", "PEND. AGAMA ISLAM")}` },
+            { jam: "8-10", mapel: "FISIKA", guru: getTeacherName("Hidayatun Nikmah", "FISIKA") }
+        ],
+        "Kamis": [
+            { jam: "1-2", mapel: "BAHASA INDONESIA", guru: getTeacherName("Niken", "BAHASA INDONESIA") },
+            { jam: "3-4", mapel: "MATEMATIKA", guru: getTeacherName("Wawan", "MATEMATIKA") },
+            { jam: "5-6", mapel: "SEJARAH", guru: getTeacherName("Ari Sulastri", "SEJARAH") },
+            { jam: "7-8", mapel: "PPKN", guru: getTeacherName("Muslicha", "PPKN") },
+            { jam: "9-10", mapel: "MATEMATIKA", guru: `${getTeacherName("Fauziyah Fitriyani", "EKONOMI")} / ${getTeacherName("Suci Fitria", "MATEMATIKA")}` }
+        ],
+        "Jumat": [
+            { jam: "1-2", mapel: "SENI BUDAYA", guru: getTeacherName("Reza", "SENI BUDAYA") },
+            { jam: "3-4", mapel: "FISIKA", guru: getTeacherName("Hidayatun Nikmah", "FISIKA") },
+            { jam: "5-6", mapel: "KIMIA", guru: getTeacherName("Rossy", "KIMIA") }
+        ]
+    };
 
     const groupedTeacherData = rawTeacherData.reduce((acc, teacher) => {
         if (!acc[teacher.mapel]) {
@@ -323,15 +353,27 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentStudentPage = 0;
     let totalStudentPages = Math.ceil(studentData.length / studentsPerPage);
 
-    let taskData = JSON.parse(localStorage.getItem('taskData')) || [];
     const tasksPerPage = 7;
     let currentTaskPage = 0;
-    let totalTaskPages = Math.ceil(taskData.length / tasksPerPage);
+    let totalTaskPages = 0;
 
     const subjectDatabase = [
-        "Fisika", "Kimia", "Agama Islam", "Agama Kristen", "Sejarah", "Matematika Wajib",
-        "Matematika Lanjut", "Bahasa Inggris", "Bahasa Indonesia", "Informatika", "PPKn",
-        "Seni Budaya", "PKWU", "PJOK", "BK", "PEND. AGAMA", "EKONOMI", "SOSIOLOGI", "GEOGRAFI", "BAHASA JERMAN", "BIMBINGAN KONSELING"
+        "PPKN",
+        "Pendidikan Agama Islam",
+        "Pendidikan Agama Kristen",
+        "Pendidikan Agama Katolik",
+        "Bahasa Indonesia",
+        "Sejarah",
+        "Bahasa Inggris",
+        "PJOK",
+        "Matematika Wajib",
+        "Matematika Lanjut",
+        "Fisika",
+        "Kimia",
+        "Seni Budaya",
+        "BK",
+        "Informatika",
+        "PKWU"
     ];
 
     function populateTeacherTable(tableBodyElement, teachers) {
@@ -346,18 +388,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 tableBodyElement.appendChild(row);
             });
-            if (tableBodyElement === searchResultsTeacherTableBody) {
-                noSearchResultsMessage.classList.add('hidden');
-            }
-        } else {
-            tableBodyElement.innerHTML = '<tr><td colspan="3" style="text-align: center; opacity: 0.7;">Tidak ada guru untuk mata pelajaran ini.</td></tr>';
-            if (tableBodyElement === searchResultsTeacherTableBody) {
-                noSearchResultsMessage.classList.remove('hidden');
-            }
         }
     }
 
-    function renderSubjectBoxes(page) {
+    function populateStudentSearchResultsTable(tableBodyElement, students) {
+        tableBodyElement.innerHTML = '';
+        if (students && students.length > 0) {
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.no}</td>
+                    <td>${student.nis}</td>
+                    <td>${student.nisn}</td>
+                    <td>${student.nama}</td>
+                `;
+                tableBodyElement.appendChild(row);
+            });
+        }
+    }
+
+    function showLoading(overlayElement) {
+        overlayElement.classList.remove('hidden');
+    }
+
+    function hideLoading(overlayElement) {
+        overlayElement.classList.add('hidden');
+    }
+
+    async function renderSubjectBoxes(page) {
+        showLoading(teacherLoadingOverlay);
+        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+        
         const start = page * itemsPerPage;
         const end = start + itemsPerPage;
         const subjectsToDisplay = subjectNames.slice(start, end);
@@ -369,6 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (subjectsToDisplay.length === 0 && subjectNames.length > 0) {
             currentTeacherPage = 0;
             renderSubjectBoxes(currentTeacherPage);
+            hideLoading(teacherLoadingOverlay);
             return;
         } else if (subjectsToDisplay.length === 0 && subjectNames.length === 0) {
             subjectGridContainer.innerHTML = '<p style="text-align: center; opacity: 0.7; padding-top: 20px;">Tidak ada data guru yang tersedia.</p>';
@@ -393,33 +455,52 @@ document.addEventListener('DOMContentLoaded', () => {
         prevSubjectPageArrow.style.pointerEvents = currentTeacherPage === 0 ? 'none' : 'auto';
         nextSubjectPageArrow.style.opacity = (currentTeacherPage >= totalPages - 1 && totalPages > 0) ? '0.5' : '1';
         nextSubjectPageArrow.style.pointerEvents = (currentTeacherPage >= totalPages - 1 && totalPages > 0) ? 'none' : 'auto';
+
+        hideLoading(teacherLoadingOverlay);
     }
 
-    const savedMode = localStorage.getItem('theme');
-    if (savedMode) {
-        body.classList.add(savedMode);
-        if (savedMode === 'light-mode') {
-            modeIcon.classList.remove('fa-moon');
-            modeIcon.classList.add('fa-sun');
-        }
-    } else {
-        body.classList.add('dark-mode');
+    function applyTheme(themeName) {
+        themes.forEach(theme => body.classList.remove(theme));
+        body.classList.add(themeName);
+        localStorage.setItem('selectedTheme', themeName);
+        currentTheme = themeName;
+        updateActiveThemeButton(themeName);
     }
+
+    function loadSavedTheme() {
+        const savedTheme = localStorage.getItem('selectedTheme');
+        if (savedTheme && themes.includes(savedTheme)) {
+            applyTheme(savedTheme);
+        } else {
+            applyTheme(currentTheme);
+        }
+    }
+
+    function updateActiveThemeButton(activeThemeName) {
+        themeButtons.forEach(button => {
+            if (button.dataset.theme === activeThemeName) {
+                button.classList.add('active-theme');
+            } else {
+                button.classList.remove('active-theme');
+            }
+        });
+    }
+
+    themeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const themeName = button.dataset.theme;
+            applyTheme(themeName);
+            showSnackbar(`Tema berhasil diganti ke ${themeNames[themeName]}!`, 'info');
+        });
+    });
+
+    loadSavedTheme();
 
     modeToggle.addEventListener('click', () => {
-        if (body.classList.contains('dark-mode')) {
-            body.classList.remove('dark-mode');
-            body.classList.add('light-mode');
-            modeIcon.classList.remove('fa-moon');
-            modeIcon.classList.add('fa-sun');
-            localStorage.setItem('theme', 'light-mode');
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark-mode');
-            modeIcon.classList.remove('fa-sun');
-            modeIcon.classList.add('fa-moon');
-            localStorage.setItem('theme', 'dark-mode');
-        }
+        const currentIndex = themes.indexOf(currentTheme);
+        const nextIndex = (currentIndex + 1) % themes.length;
+        applyTheme(themes[nextIndex]);
+        showSnackbar(`Tema diganti ke ${themeNames[themes[nextIndex]]}!`, 'info');
     });
 
     function updateJakartaDate() {
@@ -502,7 +583,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function displayJadwal(day, searchTerm = '') {
+    async function displayJadwal(day, searchTerm = '') {
+        showLoading(jadwalLoadingOverlay);
+        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+
         jadwalList.innerHTML = '';
         const jadwalToday = jadwalData[day];
         let filteredJadwal = jadwalToday;
@@ -537,6 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             jadwalList.innerHTML = '<p style="text-align: center; opacity: 0.7;">Tidak ada jadwal atau tidak ditemukan untuk pencarian ini.</p>';
         }
+        hideLoading(jadwalLoadingOverlay);
     }
 
     function loadUserProfile() {
@@ -562,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const ANIMATION_DURATION = 500;
-    const FAST_ANIMATION_DURATION = 200; // Untuk transisi cepat ke homepage
+    const FAST_ANIMATION_DURATION = 200;
 
     function showView(viewToShow, fastTransition = false) {
         if (viewToShow === currentActiveView) {
@@ -574,16 +659,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const globalBottomBar = document.getElementById('global-bottom-bar');
         const globalTopBar = document.getElementById('global-top-bar');
 
-        // Hide any open modals first
         hideTeacherModal();
         hideSearchResultsModal();
         hideTaskDetailModal();
-        hideDeleteConfirmModal(); // Sembunyikan modal konfirmasi hapus lama
-        hidePasswordConfirmModal(); // Sembunyikan modal konfirmasi password baru
+        hidePasswordConfirmModal();
 
         const transitionDuration = fastTransition ? FAST_ANIMATION_DURATION : ANIMATION_DURATION;
 
-        // Reset transition property on all views before applying new transitions
         const allViewsInContainer = document.querySelectorAll('.container > div[id$="-view"]');
         allViewsInContainer.forEach(view => {
             view.style.transition = 'none';
@@ -593,7 +675,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (globalBottomBar) globalBottomBar.style.transition = 'none';
 
 
-        // 1. Start exit animation for previous view
         if (previousView) {
             previousView.classList.remove('active-view');
             previousView.classList.add('view-exit');
@@ -603,25 +684,23 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 previousView.classList.remove('view-exit');
                 previousView.classList.add('hidden-view');
-                previousView.style.transition = ''; // Reset transition after it's done
+                previousView.style.transition = '';
             }, transitionDuration);
         }
 
-        // Determine global bar and container visibility based on target view
         if (viewToShow === coverView || viewToShow === creditView) {
             mainContainer.classList.add('hidden-view');
             globalTopBar.classList.add('hidden-view');
             globalBottomBar.classList.add('hidden-view');
-            globalBottomBar.style.transition = ''; // Pastikan transisi tidak aktif saat disembunyikan
+            globalBottomBar.style.transition = '';
             viewToShow.style.position = 'fixed';
         } else {
             mainContainer.classList.remove('hidden-view');
             globalTopBar.classList.remove('hidden-view');
             globalBottomBar.classList.remove('hidden-view');
-            globalBottomBar.style.transition = `opacity ${transitionDuration}ms ease-out, transform ${transitionDuration}ms ease-out`; // Terapkan transisi untuk bottom bar
+            globalBottomBar.style.transition = `opacity ${transitionDuration}ms ease-out, transform ${transitionDuration}ms ease-out`;
             viewToShow.style.position = 'relative';
             
-            // Explicitly hide mainView if we are going to any other internal view
             if (viewToShow !== mainView) {
                 mainView.classList.remove('active-view');
                 mainView.classList.add('hidden-view');
@@ -629,20 +708,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // 2. Prepare target view for entry animation
         viewToShow.classList.remove('hidden-view');
         viewToShow.classList.add('view-entering');
         viewToShow.style.pointerEvents = 'auto';
         viewToShow.style.transition = `opacity ${transitionDuration}ms ease-out, transform ${transitionDuration}ms ease-out`;
 
-        // 3. Start entry animation for target view
         requestAnimationFrame(() => {
             viewToShow.classList.remove('view-entering');
             viewToShow.classList.add('active-view');
             currentActiveView = viewToShow;
         });
 
-        // Initialize view-specific data/rendering when a view is shown
         if (viewToShow === jadwalView) {
             const todayReal = new Date().getDay();
             if (todayReal >= 1 && todayReal <= 5) {
@@ -673,11 +749,10 @@ document.addEventListener('DOMContentLoaded', () => {
             inputKelas.value = currentUserProfile.kelas !== "Belum diisi" ? currentUserProfile.kelas : "";
             inputAbsen.value = currentUserProfile.absen !== "Belum diisi" ? currentUserProfile.absen : "";
             inputNISN.value = currentUserProfile.nisn !== "Belum diisi" ? currentUserProfile.nisn : "";
-            inputNIS.value = currentUserProfile.nis !== "Belum diisi" ? currentUserProfile.nis : "";
+            inputNIS.value = currentUserProfile.nis !== "Belum diisi" ? currentUserUser.nis : "";
         } else if (viewToShow === manageTaskView) {
-             // Handled by showManageTaskView which calls showView
-        } else if (viewToShow === otherView) { // Pastikan renderEbookList dipanggil saat otherView aktif
-            renderEbookList();
+        } else if (viewToShow === settingsView) {
+            updateActiveThemeButton(currentTheme);
         }
     }
 
@@ -726,9 +801,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (taskId) {
             manageTaskTitle.textContent = "Edit Tugas";
             submitTaskButton.querySelector('.button-text').textContent = "Update";
-            const task = taskData.find(t => t.id == taskId);
+            const task = taskData.find(t => t._id == taskId);
             if (task) {
-                taskIdInput.value = task.id;
+                taskIdInput.value = task._id;
                 taskTitleInput.value = task.judul;
                 taskSubjectInput.value = task.mapel;
                 taskDeadlineInput.value = task.deadline;
@@ -756,8 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function hideTeacherModal() {
         teacherDetailModalOverlay.classList.remove('visible');
-        // Hanya reset overflow body jika tidak ada modal lain yang aktif
-        if (!taskDetailModalOverlay.classList.contains('visible') && !deleteConfirmModalOverlay.classList.contains('visible') && !passwordConfirmModalOverlay.classList.contains('visible')) {
+        if (!taskDetailModalOverlay.classList.contains('visible') && !passwordConfirmModalOverlay.classList.contains('visible') && !searchResultsModalOverlay.classList.contains('visible')) {
             body.style.overflow = '';
         }
     }
@@ -898,7 +972,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function showSearchResultsModal() {
+    function showSearchResultsModal(filterType, results) {
+        searchResultsTableContainer.innerHTML = '';
+        noSearchResultsMessage.classList.add('hidden');
+
+        searchResultsModalTitle.textContent = `Hasil Pencarian ${filterType === 'teacher' ? 'Guru' : 'Murid'}`;
+
+        const table = document.createElement('table');
+        table.classList.add(filterType === 'teacher' ? 'teacher-modal-table' : 'student-table');
+        table.classList.add('search-results-table');
+
+        const thead = document.createElement('thead');
+        const tbody = document.createElement('tbody');
+        
+        let headerRow = document.createElement('tr');
+        if (filterType === 'teacher') {
+            headerRow.innerHTML = '<th>Kode</th><th>Nama</th><th>Mapel</th>';
+            populateTeacherTable(tbody, results);
+        } else {
+            headerRow.innerHTML = '<th>No.</th><th>NIS</th><th>NISN</th><th>Nama</th>';
+            populateStudentSearchResultsTable(tbody, results);
+        }
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        searchResultsTableContainer.appendChild(table);
+
+        if (!results || results.length === 0) {
+            noSearchResultsMessage.classList.remove('hidden');
+        }
+
         body.style.overflow = 'hidden';
         searchResultsModalOverlay.classList.add('visible');
     }
@@ -906,32 +1009,43 @@ document.addEventListener('DOMContentLoaded', () => {
     function hideSearchResultsModal() {
         searchResultsModalOverlay.classList.remove('visible');
         setTimeout(() => {
-            // Hanya reset overflow body jika tidak ada modal lain yang aktif
-            if (!taskDetailModalOverlay.classList.contains('visible') && !deleteConfirmModalOverlay.classList.contains('visible') && !passwordConfirmModalOverlay.classList.contains('visible')) {
+            if (!taskDetailModalOverlay.classList.contains('visible') && !passwordConfirmModalOverlay.classList.contains('visible') && !teacherDetailModalOverlay.classList.contains('visible')) {
                 body.style.overflow = '';
             }
-            searchResultsTeacherTableBody.innerHTML = '';
+            searchResultsTableContainer.innerHTML = '';
             noSearchResultsMessage.classList.add('hidden');
         }, ANIMATION_DURATION);
-        headerSearchInput.value = '';
+        globalSearchInput.value = '';
     }
 
-    const handleTeacherSearchDebounced = debounce(function() {
-        const searchTerm = headerSearchInput.value.toLowerCase().trim();
+    const handleGlobalSearchDebounced = debounce(function() {
+        const searchTerm = globalSearchInput.value.toLowerCase().trim();
         if (searchTerm.length > 0) {
-            const filteredTeachers = rawTeacherData.filter(teacher =>
-                teacher.nama.toLowerCase().includes(searchTerm) ||
-                teacher.mapel.toLowerCase().includes(searchTerm) ||
-                teacher.kode.toLowerCase().includes(searchTerm)
-            );
-            populateTeacherTable(searchResultsTeacherTableBody, filteredTeachers);
-            showSearchResultsModal();
+            let filteredResults;
+            if (currentSearchFilter === 'teacher') {
+                filteredResults = rawTeacherData.filter(teacher =>
+                    teacher.nama.toLowerCase().includes(searchTerm) ||
+                    teacher.mapel.toLowerCase().includes(searchTerm) ||
+                    teacher.kode.toLowerCase().includes(searchTerm)
+                );
+                showSearchResultsModal('teacher', filteredResults);
+            } else {
+                filteredResults = studentData.filter(student =>
+                    student.nama.toLowerCase().includes(searchTerm) ||
+                    String(student.nis).includes(searchTerm) ||
+                    String(student.nisn).includes(searchTerm)
+                );
+                showSearchResultsModal('student', filteredResults);
+            }
         } else {
             hideSearchResultsModal();
         }
     }, 300);
 
-    function renderStudentTable(page, searchTerm = '') {
+    async function renderStudentTable(page, searchTerm = '') {
+        showLoading(studentLoadingOverlay);
+        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+
         let filteredStudents = studentData;
         if (searchTerm) {
             const lowerCaseSearchTerm = searchTerm.toLowerCase();
@@ -979,94 +1093,104 @@ document.addEventListener('DOMContentLoaded', () => {
         prevStudentPageArrow.style.pointerEvents = currentStudentPage === 0 ? 'none' : 'auto';
         nextStudentPageArrow.style.opacity = (currentStudentPage >= totalStudentPages - 1 && totalStudentPages > 0) ? '0.5' : '1';
         nextStudentPageArrow.style.pointerEvents = (currentStudentPage >= totalStudentPages - 1 && totalStudentPages > 0) ? 'none' : 'auto';
+
+        hideLoading(studentLoadingOverlay);
     }
 
-    function renderTaskTable(page) {
-        taskData.forEach((t, index) => {
-            t.no = index + 1;
-        });
-        localStorage.setItem('taskData', JSON.stringify(taskData));
+    async function renderTaskTable(page) {
+        showLoading(taskLoadingOverlay);
+        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
 
-        totalTaskPages = Math.ceil(taskData.length / tasksPerPage);
-        if (page >= totalTaskPages && totalTaskPages > 0) {
-            currentTaskPage = totalTaskPages - 1;
-            page = currentTaskPage;
-        } else if (totalTaskPages === 0) {
-            currentTaskPage = 0;
-            page = 0;
-        }
+        try {
+            const response = await fetch(`${backendUrl}/api/tasks`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            taskData = result.tasks;
+            
+            taskData.forEach((t, index) => {
+                t.no = index + 1;
+            });
 
-        const start = page * tasksPerPage;
-        const end = start + tasksPerPage;
-        const tasksToDisplay = taskData.slice(start, end);
+            totalTaskPages = Math.ceil(taskData.length / tasksPerPage);
+            if (page >= totalTaskPages && totalTaskPages > 0) {
+                currentTaskPage = totalTaskPages - 1;
+                page = currentTaskPage;
+            } else if (totalTaskPages === 0) {
+                currentTaskPage = 0;
+                page = 0;
+            }
 
-        taskTableBody.innerHTML = '';
+            const start = page * tasksPerPage;
+            const end = start + tasksPerPage;
+            const tasksToDisplay = taskData.slice(start, end);
 
-        if (tasksToDisplay.length > 0) {
-            tasksToDisplay.forEach(task => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${task.no}</td>
-                    <td>${task.judul}</td>
-                    <td>${task.mapel}</td>
-                    <td>${task.deadline}</td>
-                    <td class="action-buttons">
-                        <button class="action-button edit-button" data-id="${task.id}" title="Edit Tugas"><i class="fas fa-edit"></i></button>
-                        <button class="action-button delete-button" data-id="${task.id}" title="Hapus Tugas"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                // Add event listener to row itself for detail modal
-                row.addEventListener('click', (event) => {
-                    // Only open detail modal if a button within the row wasn't clicked
-                    if (!event.target.closest('.action-button')) {
-                        showTaskDetailModal(task.id);
-                    }
+            taskTableBody.innerHTML = '';
+
+            if (tasksToDisplay.length > 0) {
+                tasksToDisplay.forEach(task => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${task.no}</td>
+                        <td>${task.judul}</td>
+                        <td>${task.mapel}</td>
+                        <td>${task.deadline}</td>
+                        <td class="action-buttons">
+                            <button class="action-button edit-button" data-id="${task._id}" title="Edit Tugas"><i class="fas fa-edit"></i></button>
+                            <button class="action-button delete-button" data-id="${task._id}" title="Hapus Tugas"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    row.addEventListener('click', (event) => {
+                        if (!event.target.closest('.action-button')) {
+                            showTaskDetailModal(task._id);
+                        }
+                    });
+                    taskTableBody.appendChild(row);
                 });
-                taskTableBody.appendChild(row);
-            });
-        } else {
-            // Updated: HTML untuk pesan 'Belum ada tugas.' akan diatur sepenuhnya oleh CSS
-            taskTableBody.innerHTML = '<tr><td colspan="5">Belum ada tugas.</td></tr>';
+            } else {
+                taskTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; opacity: 0.7; padding: 20px;">Tidak ada tugas yang tersedia.</td></tr>';
+            }
+
+            currentTaskPageDisplay.textContent = page + 1;
+            totalTaskPagesDisplay.textContent = totalTaskPages > 0 ? totalTaskPages : 1;
+
+            prevTaskPageArrow.style.opacity = currentTaskPage === 0 ? '0.5' : '1';
+            prevTaskPageArrow.style.pointerEvents = currentTaskPage === 0 ? 'none' : 'auto';
+            nextTaskPageArrow.style.opacity = (currentTaskPage >= totalTaskPages - 1 && totalTaskPages > 0) ? '0.5' : '1';
+            nextTaskPageArrow.style.pointerEvents = (currentTaskPage >= totalTaskPages - 1 && totalTaskPages > 0) ? 'none' : 'auto';
+
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+            showSnackbar('Gagal memuat tugas dari server. Pastikan backend berjalan.', 'error');
+            
+            taskTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; opacity: 0.7; padding: 20px;">Gagal memuat tugas.</td></tr>';
+            
+            taskData = [];
+            currentTaskPage = 0;
+            totalTaskPages = 1;
+            currentTaskPageDisplay.textContent = 1;
+            totalTaskPagesDisplay.textContent = 1;
+            prevTaskPageArrow.style.opacity = '0.5';
+            prevTaskPageArrow.style.pointerEvents = 'none';
+            nextTaskPageArrow.style.opacity = '0.5';
+            nextTaskPageArrow.style.pointerEvents = 'none';
+        } finally {
+            hideLoading(taskLoadingOverlay);
         }
-
-        currentTaskPageDisplay.textContent = page + 1;
-        totalTaskPagesDisplay.textContent = totalTaskPages > 0 ? totalTaskPages : 1;
-
-        prevTaskPageArrow.style.opacity = currentTaskPage === 0 ? '0.5' : '1';
-        prevTaskPageArrow.style.pointerEvents = currentTaskPage === 0 ? 'none' : 'auto';
-        nextTaskPageArrow.style.opacity = (currentTaskPage >= totalTaskPages - 1 && totalTaskPages > 0) ? '0.5' : '1';
-        nextTaskPageArrow.style.pointerEvents = (currentTaskPage >= totalTaskPages - 1 && totalTaskPages > 0) ? 'none' : 'auto';
-
-
-        // Event listeners untuk tombol edit/delete di tabel
-        document.querySelectorAll('#task-table-body .edit-button').forEach(button => {
-            button.addEventListener('click', (event) => {
-                const taskId = event.currentTarget.dataset.id;
-                showManageTaskView(taskId);
-            });
-        });
-
-        document.querySelectorAll('#task-table-body .delete-button').forEach(button => {
-            button.addEventListener('click', (event) => {
-                taskToDeleteId = event.currentTarget.dataset.id;
-                showPasswordConfirmModal(); // Langsung panggil modal password
-            });
-        });
     }
 
-    // Modifikasi fungsi showTaskDetailModal
     function showTaskDetailModal(id) {
-        const task = taskData.find(t => t.id == id);
+        const task = taskData.find(t => t._id == id);
         if (task) {
             taskDetailModalTitle.textContent = task.judul;
             taskDetailSubject.textContent = task.mapel;
-            const deadlineDate = new Date(task.deadline);
+            const deadlineDate = new Date(task.deadline + 'T00:00:00');
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             taskDetailDeadline.textContent = deadlineDate.toLocaleDateString('id-ID', options);
             taskDetailContent.textContent = task.isi;
 
-            // Set data-id pada tombol hapus di dalam modal detail
-            deleteTaskFromDetailButton.dataset.id = id;
+            deleteTaskFromDetailButton.dataset.id = task._id;
 
             taskDetailModalOverlay.classList.add('visible');
             body.style.overflow = 'hidden';
@@ -1075,8 +1199,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function hideTaskDetailModal() {
         taskDetailModalOverlay.classList.remove('visible');
-        // Hanya reset overflow body jika tidak ada modal lain yang aktif
-        if (!teacherDetailModalOverlay.classList.contains('visible') && !deleteConfirmModalOverlay.classList.contains('visible') && !passwordConfirmModalOverlay.classList.contains('visible') && !searchResultsModalOverlay.classList.contains('visible')) {
+        if (!teacherDetailModalOverlay.classList.contains('visible') && !passwordConfirmModalOverlay.classList.contains('visible') && !searchResultsModalOverlay.classList.contains('visible')) {
             body.style.overflow = '';
         }
     }
@@ -1090,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    manageTaskForm.addEventListener('submit', (event) => {
+    manageTaskForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         clearTaskErrorMessages();
 
@@ -1101,126 +1224,128 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButtonSpinner.classList.remove('hidden');
         submitTaskButton.disabled = true;
 
-        setTimeout(() => {
-            let isValid = true;
+        let isValid = true;
 
-            const id = taskIdInput.value;
-            const title = taskTitleInput.value.trim();
-            const subject = taskSubjectInput.value.trim();
-            const deadline = taskDeadlineInput.value;
-            const content = taskContentInput.value.trim();
+        const id = taskIdInput.value;
+        const judul = taskTitleInput.value.trim();
+        const mapel = taskSubjectInput.value.trim();
+        const deadline = taskDeadlineInput.value;
+        const isi = taskContentInput.value.trim();
 
-            if (title === "") {
-                displayErrorMessage(errorTaskTitle, "Judul tugas tidak boleh kosong.");
+        if (judul === "") {
+            displayErrorMessage(errorTaskTitle, "Judul tugas tidak boleh kosong.");
+            isValid = false;
+        }
+        if (mapel === "") {
+            displayErrorMessage(errorTaskSubject, "Mata Pelajaran tidak boleh kosong.");
+            isValid = false;
+        } else if (!subjectDatabase.includes(mapel)) {
+            displayErrorMessage(errorTaskSubject, "Mata Pelajaran tidak valid. Pilih dari daftar yang tersedia.");
+            isValid = false;
+        }
+        if (deadline === "") {
+            displayErrorMessage(errorTaskDeadline, "Deadline tidak boleh kosong.");
+            isValid = false;
+        } else {
+            const selectedDate = new Date(deadline);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (selectedDate < today) {
+                displayErrorMessage(errorTaskDeadline, "Deadline tidak boleh di tanggal yang sudah lewat.");
                 isValid = false;
             }
-            if (subject === "") {
-                displayErrorMessage(errorTaskSubject, "Mata Pelajaran tidak boleh kosong.");
-                isValid = false;
-            } else if (!subjectDatabase.includes(subject)) {
-                displayErrorMessage(errorTaskSubject, "Mata Pelajaran tidak valid. Pilih dari daftar yang tersedia.");
-                isValid = false;
-            }
-            if (deadline === "") {
-                displayErrorMessage(errorTaskDeadline, "Deadline tidak boleh kosong.");
-                isValid = false;
-            } else {
-                const selectedDate = new Date(deadline);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                if (selectedDate < today) {
-                    displayErrorMessage(errorTaskDeadline, "Deadline tidak boleh di tanggal yang sudah lewat.");
-                    isValid = false;
-                }
-            }
-            if (content === "") {
-                displayErrorMessage(errorTaskContent, "Isi deskripsi tugas tidak boleh kosong.");
-                isValid = false;
-            }
+        }
+        if (isi === "") {
+            displayErrorMessage(errorTaskContent, "Isi deskripsi tugas tidak boleh kosong.");
+            isValid = false;
+        }
 
-            if (isValid) {
+        if (isValid) {
+            try {
+                let apiEndpoint = `${backendUrl}/api/tasks`;
+                let httpMethod = 'POST';
                 if (id) {
-                    const index = taskData.findIndex(t => t.id == id);
-                    if (index !== -1) {
-                        taskData[index] = { ...taskData[index], judul: title, mapel: subject, deadline: deadline, isi: content };
-                        showSnackbar('Tugas berhasil diperbarui!', 'success');
-                    }
-                } else {
-                    const newTask = {
-                        id: Date.now(),
-                        judul: title,
-                        mapel: subject,
-                        deadline: deadline,
-                        isi: content
-                    };
-                    taskData.push(newTask);
-                    showSnackbar('Tugas berhasil ditambahkan!', 'success');
+                    apiEndpoint = `${backendUrl}/api/tasks/${id}`;
+                    httpMethod = 'PUT';
                 }
-                localStorage.setItem('taskData', JSON.stringify(taskData));
-                showTaskView();
-            } else {
-                showSnackbar('Gagal menyimpan tugas. Periksa kembali input Anda.', 'error');
+
+                const response = await fetch(apiEndpoint, {
+                    method: httpMethod,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ judul, mapel, deadline, isi }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSnackbar(`Tugas berhasil di${id ? 'perbarui' : 'tambahkan'}!`, 'success');
+                    showTaskView();
+                    await renderTaskTable(currentTaskPage);
+                } else {
+                    showSnackbar(`Gagal ${id ? 'memperbarui' : 'menambahkan'} tugas: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error(`Error ${id ? 'updating' : 'adding'} task:`, error);
+                showSnackbar(`Terjadi kesalahan saat ${id ? 'menyimpan' : 'menambahkan'} tugas. Pastikan backend berjalan.`, 'error');
             }
+        } else {
+            showSnackbar('Gagal menyimpan tugas. Periksa kembali input Anda.', 'error');
+        }
 
-            submitButtonText.classList.remove('hidden');
-            submitButtonSpinner.classList.add('hidden');
-            submitTaskButton.disabled = false;
-
-        }, 1000);
+        submitButtonText.classList.remove('hidden');
+        submitButtonSpinner.classList.add('hidden');
+        submitTaskButton.disabled = false;
     });
 
-    // Ini adalah modal konfirmasi hapus LAMA (tidak dipakai jika alur password-confirm mengganti)
-    function hideDeleteConfirmModal() {
-        deleteConfirmModalOverlay.classList.remove('visible');
-        // Hanya reset overflow body jika tidak ada modal lain yang aktif
-        if (!taskDetailModalOverlay.classList.contains('visible') && !teacherDetailModalOverlay.classList.contains('visible') && !passwordConfirmModalOverlay.classList.contains('visible') && !searchResultsModalOverlay.classList.contains('visible')) {
+    function showPasswordConfirmModal() {
+        passwordConfirmModalOverlay.classList.add('visible');
+        passwordInput.value = '';
+        clearErrorMessage(errorPassword);
+        passwordInput.focus();
+        body.style.overflow = 'hidden';
+    }
+
+    function hidePasswordConfirmModal() {
+        passwordConfirmModalOverlay.classList.remove('visible');
+        if (!taskDetailModalOverlay.classList.contains('visible') && !teacherDetailModalOverlay.classList.contains('visible') && !searchResultsModalOverlay.classList.contains('visible')) {
             body.style.overflow = '';
         }
         taskToDeleteId = null;
     }
 
-    // NEW: Fungsi untuk menampilkan modal konfirmasi password
-    function showPasswordConfirmModal() {
-        passwordConfirmModalOverlay.classList.add('visible');
-        passwordInput.value = ''; // Kosongkan input password
-        clearErrorMessage(errorPassword); // Bersihkan pesan error sebelumnya
-        passwordInput.focus(); // Fokus ke input password
-        body.style.overflow = 'hidden'; // Pastikan body tetap terkunci scrollnya
-    }
-
-    // NEW: Fungsi untuk menyembunyikan modal konfirmasi password
-    function hidePasswordConfirmModal() {
-        passwordConfirmModalOverlay.classList.remove('visible');
-        // Hanya reset overflow body jika tidak ada modal lain yang aktif
-        if (!taskDetailModalOverlay.classList.contains('visible') && !deleteConfirmModalOverlay.classList.contains('visible') && !teacherDetailModalOverlay.classList.contains('visible') && !searchResultsModalOverlay.classList.contains('visible')) {
-            body.style.overflow = '';
-        }
-        taskToDeleteId = null; // Pastikan ID tugas yang akan dihapus direset
-    }
-
-    // NEW: Event listener untuk tombol hapus di dalam modal detail tugas
     deleteTaskFromDetailButton.addEventListener('click', (event) => {
-        taskToDeleteId = event.currentTarget.dataset.id; // Simpan ID tugas yang akan dihapus
-        hideTaskDetailModal(); // Sembunyikan modal detail tugas
-        showPasswordConfirmModal(); // Tampilkan modal konfirmasi password
+        taskToDeleteId = event.currentTarget.dataset.id;
+        hideTaskDetailModal();
+        showPasswordConfirmModal();
     });
 
-    // NEW: Event listener untuk form konfirmasi password
-    confirmPasswordDeleteButton.addEventListener('click', () => {
+    confirmPasswordDeleteButton.addEventListener('click', async () => {
         const inputPassword = passwordInput.value.trim();
-        const correctPassword = "123"; // Password yang benar
+        const correctPassword = "123";
 
         if (inputPassword === correctPassword) {
             if (taskToDeleteId) {
-                taskData = taskData.filter(t => t.id != taskToDeleteId);
-                // Re-index nomor tugas setelah penghapusan
-                taskData.forEach((t, index) => {
-                    t.no = index + 1;
-                });
-                localStorage.setItem('taskData', JSON.stringify(taskData));
-                hidePasswordConfirmModal();
-                showTaskView(); // Kembali ke tampilan tugas setelah hapus
-                showSnackbar('Tugas berhasil dihapus!', 'success');
+                try {
+                    const response = await fetch(`${backendUrl}/api/tasks/${taskToDeleteId}`, {
+                        method: 'DELETE',
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showSnackbar('Tugas berhasil dihapus!', 'success');
+                        hidePasswordConfirmModal();
+                        showTaskView();
+                        await renderTaskTable(currentTaskPage);
+                    } else {
+                        showSnackbar(`Gagal menghapus tugas: ${data.message}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting task:', error);
+                    showSnackbar('Terjadi kesalahan saat menghapus tugas. Pastikan backend berjalan.', 'error');
+                }
             }
         } else {
             displayErrorMessage(errorPassword, "Password salah!");
@@ -1228,147 +1353,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // NEW: Event listener untuk tombol batal di modal password
     cancelPasswordDeleteButton.addEventListener('click', hidePasswordConfirmModal);
 
-    // NEW: Event listener untuk menutup modal password dengan klik ikon 'X'
     closePasswordConfirmModal.addEventListener('click', hidePasswordConfirmModal);
 
-    // NEW: Event listener untuk menutup modal password dengan klik di luar modal
     passwordConfirmModalOverlay.addEventListener('click', (event) => {
         if (event.target === passwordConfirmModalOverlay) {
             hidePasswordConfirmModal();
         }
     });
 
-    // NEW: Fungsi untuk mengunggah file e-book ke Cloudinary melalui backend Node.js
-    async function uploadEbook(file) {
-        if (!file) {
-            showSnackbar('Pilih file e-book untuk diunggah.', 'error');
-            return;
-        }
-
-        // Validasi tipe file di frontend (tambahan keamanan)
-        const allowedTypes = ['application/pdf', 'application/epub+zip', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-        if (!allowedTypes.includes(file.type)) {
-            showSnackbar('Tipe file tidak didukung. Harap unggah PDF, EPUB, DOCX, atau TXT.', 'error');
-            return;
-        }
-
-        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-        if (file.size > MAX_FILE_SIZE) {
-            showSnackbar('Ukuran file e-book terlalu besar. Maksimum 10MB.', 'error');
-            return;
-        }
-
-        showSnackbar('Mengunggah e-book, mohon tunggu...', 'info');
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file); // Konversi file ke Base64
-
-        reader.onloadend = async () => {
-            try {
-                // Panggil backend Node.js Anda
-                const response = await fetch('http://localhost:3000/upload-ebook', { // <<< PASTIKAN URL INI BENAR SAAT DEPLOY!
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        fileName: file.name,
-                        fileContent: reader.result // Base64 string
-                    }),
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showSnackbar('E-book berhasil diunggah!', 'success');
-                    // Simpan URL e-book ke daftar Anda
-                    ebookList.push({
-                        name: file.name,
-                        url: data.url,
-                        publicId: data.public_id
-                    });
-                    localStorage.setItem('ebookList', JSON.stringify(ebookList));
-                    renderEbookList(); // Perbarui tampilan daftar e-book
-                } else {
-                    showSnackbar(`Gagal mengunggah e-book: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                console.error('Error uploading ebook:', error);
-                showSnackbar('Terjadi kesalahan saat mengunggah e-book. Pastikan backend berjalan.', 'error');
-            }
-        };
-
-        reader.onerror = () => {
-            showSnackbar('Gagal membaca file e-book.', 'error');
-        };
-    }
-
-    // NEW: Fungsi untuk merender daftar e-book
-    function renderEbookList() {
-        if (!ebookListContainer) return; // Pastikan elemen ada
-
-        ebookListContainer.innerHTML = ''; // Kosongkan daftar sebelumnya
-
-        if (ebookList.length === 0) {
-            ebookListContainer.innerHTML = '<p style="text-align: center; opacity: 0.7; padding-top: 20px;">Belum ada e-book yang diunggah.</p>';
-            return;
-        }
-
-        ebookList.forEach((ebook, index) => {
-            const ebookItem = document.createElement('div');
-            ebookItem.classList.add('ebook-item');
-            ebookItem.innerHTML = `
-                <span>${index + 1}. ${ebook.name}</span>
-                <div class="ebook-actions">
-                    <a href="${ebook.url}" target="_blank" class="action-button view-button" title="Lihat E-book"><i class="fas fa-eye"></i></a>
-                    <button class="action-button delete-ebook-button" data-index="${index}" title="Hapus E-book"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-            ebookListContainer.appendChild(ebookItem);
-        });
-
-        // Tambahkan event listener untuk tombol hapus e-book
-        document.querySelectorAll('.delete-ebook-button').forEach(button => {
-            button.addEventListener('click', (event) => {
-                const indexToDelete = parseInt(event.currentTarget.dataset.index);
-                // Di sini Anda bisa menambahkan konfirmasi password lagi jika ingin keamanan ekstra saat menghapus
-                // Untuk demo ini, kita langsung hapus dari daftar lokal
-                ebookList.splice(indexToDelete, 1);
-                localStorage.setItem('ebookList', JSON.stringify(ebookList));
-                renderEbookList();
-                showSnackbar('E-book berhasil dihapus.', 'success');
-            });
-        });
-    }
-
-    // Event listener untuk tombol E-Book di main-view
     ebookBox.addEventListener('click', () => {
-        showOtherView(); // Pergi ke other-view
-        renderEbookList(); // Panggil ini saat other-view aktif
+        window.open('https://drive.google.com/drive/u/0/folders/1I9tEvAKkkc-r1YCESmpsfX7_p3dys7id', '_blank');
+        showSnackbar('Mengarahkan ke Google Drive E-Book.', 'info');
     });
-
-    // Event listener untuk input file ebook (tersembunyi)
-    ebookUploadInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            uploadEbook(file);
-        }
-    });
-
-    // Event listener untuk tombol unggah e-book (di other-view)
-    if (addEbookButton) { // Pastikan tombol ada
-        addEbookButton.addEventListener('click', () => {
-            ebookUploadInput.click(); // Panggil klik pada input file tersembunyi
-        });
-    }
-
 
     jadwalBox.addEventListener('click', showJadwalView);
     studentBox.addEventListener('click', showStudentView);
-    othersBox.addEventListener('click', showOtherView);
     teacherBox.addEventListener('click', showTeacherView);
     taskBox.addEventListener('click', showTaskView);
     settingsButtonFooter.addEventListener('click', showSettingsView);
@@ -1377,11 +1378,11 @@ document.addEventListener('DOMContentLoaded', () => {
     loginBackButton.addEventListener('click', showProfileView);
 
     globalHomeButtonFooter.addEventListener('click', () => {
-        showMainView(true); // Cepat ke homepage dari footer
+        showMainView(true);
     });
 
     goToHomepageButton.addEventListener('click', () => {
-        showMainView(); // Dari cover, transisi normal
+        showMainView();
     });
 
     goToCreditButton.addEventListener('click', () => {
@@ -1401,6 +1402,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (event) => {
         if (!dayDisplayBubble.contains(event.target) && !customDayDropdown.contains(event.target)) {
             toggleDayDropdown(false);
+        }
+        if (!searchFilterButton.contains(event.target) && !searchFilterDropdownContent.contains(event.target)) {
+            searchFilterDropdownContent.classList.remove('show');
+            searchFilterButton.classList.remove('active');
         }
     });
 
@@ -1450,7 +1455,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentFilteredStudents = studentData.filter(student =>
             student.nama.toLowerCase().includes(studentSearchInput.value.toLowerCase().trim()) ||
             String(student.nis).includes(studentSearchInput.value.toLowerCase().trim()) ||
-            String(student.nisn).includes(lowerCaseSearchTerm)
+            String(student.nisn).includes(studentSearchInput.value.toLowerCase().trim())
         );
         totalStudentPages = Math.ceil(currentFilteredStudents.length / studentsPerPage);
 
@@ -1474,7 +1479,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     nextTaskPageArrow.addEventListener('click', () => {
-        totalTaskPages = Math.ceil(taskData.length / tasksPerPage);
         if (currentTaskPage < totalTaskPages - 1) {
             currentTaskPage++;
             renderTaskTable(currentTaskPage);
@@ -1498,7 +1502,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    headerSearchInput.addEventListener('input', handleTeacherSearchDebounced);
+    globalSearchInput.addEventListener('input', handleGlobalSearchDebounced);
     closeSearchModalButton.addEventListener('click', hideSearchResultsModal);
     searchResultsModalOverlay.addEventListener('click', (event) => {
         if (event.target === searchResultsModalOverlay) {
@@ -1506,7 +1510,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.querySelectorAll('.grid-item, .settings-item-full, .other-item, .cover-button, .day-nav-arrow, .pagination-arrow, .login-button, .publish-button, .add-task-button, .action-button, .confirm-button, .login-specific-top-bar .back-button, .credit-specific-top-bar .back-button, .delete-task-from-detail-button, .add-ebook-button').forEach(item => {
+    searchFilterButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        searchFilterDropdownContent.classList.toggle('show');
+        searchFilterButton.classList.toggle('active');
+    });
+
+    document.querySelectorAll('.search-filter-item').forEach(item => {
+        item.addEventListener('click', (event) => {
+            currentSearchFilter = event.target.dataset.filter;
+            currentSearchFilterDisplay.textContent = event.target.textContent;
+            searchFilterDropdownContent.classList.remove('show');
+            searchFilterButton.classList.remove('active');
+            globalSearchInput.placeholder = `Cari ${event.target.textContent}...`;
+            globalSearchInput.value = '';
+            hideSearchResultsModal();
+        });
+    });
+
+    document.querySelectorAll('.grid-item, .settings-item-full, .other-item, .cover-button, .day-nav-arrow, .pagination-arrow, .login-button, .publish-button, .add-task-button, .action-button, .confirm-button, .login-specific-top-bar .back-button, .credit-specific-top-bar .back-button, .delete-task-from-detail-button, .theme-button').forEach(item => {
         item.addEventListener('mousedown', (e) => {
             e.currentTarget.classList.add('active');
         });
@@ -1516,7 +1538,13 @@ document.addEventListener('DOMContentLoaded', () => {
         item.addEventListener('mouseleave', (e) => {
             e.currentTarget.classList.remove('active');
         });
-        if (item.tagName === 'INPUT' || item.tagName === 'TEXTAREA') {
+        if (item.classList.contains('settings-item-full') || item.classList.contains('login-button') || item.classList.contains('other-item') || item.classList.contains('subject-box') || item.classList.contains('add-task-button') || item.classList.contains('publish-button') || item.classList.contains('delete-task-from-detail-button') || item.classList.contains('confirm-button') || item.classList.contains('cover-button') || item.classList.contains('theme-button')) {
+            if (!item.style.transition.includes('filter')) {
+                item.style.transition += ', filter 0.2s ease';
+            }
+        }
+
+        if (item.tagName === 'INPUT' || item.tagName === 'TEXTAREA' || item.tagName === 'SELECT') {
             item.addEventListener('focus', (e) => {
                 e.currentTarget.classList.add('focused');
             });
@@ -1526,10 +1554,406 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    let isPulling = false;
+    let startY = 0;
+    const PULL_THRESHOLD = 80; // pixels to pull to trigger refresh
+    const REFRESH_TIMEOUT = 1000; // milliseconds before allowing another refresh
 
-    // Initial setup when DOM is loaded
+    let lastRefreshTime = 0;
+
+    function handlePullToRefresh(e, container, refreshCallback, loadingOverlay) {
+        if (e.targetTouches.length === 1 && container.scrollTop === 0) {
+            const touch = e.targetTouches[0];
+            if (!isPulling) {
+                isPulling = true;
+                startY = touch.clientY;
+                container.style.transition = 'none'; // Disable transition during pull
+            }
+
+            const currentY = touch.clientY;
+            const pullDelta = currentY - startY;
+
+            if (pullDelta > 0) {
+                container.style.transform = `translateY(${Math.min(pullDelta, PULL_THRESHOLD * 1.5)}px)`;
+                if (pullDelta > PULL_THRESHOLD && !container.classList.contains('pull-to-refresh-ready')) {
+                    container.classList.add('pull-to-refresh-ready');
+                    showSnackbar('Lepas untuk menyegarkan!', 'info');
+                } else if (pullDelta <= PULL_THRESHOLD && container.classList.contains('pull-to-refresh-ready')) {
+                    container.classList.remove('pull-to-refresh-ready');
+                }
+            }
+        }
+    }
+
+    function endPullToRefresh(e, container, refreshCallback, loadingOverlay) {
+        if (isPulling) {
+            const pullDelta = e.changedTouches[0].clientY - startY;
+            container.style.transition = 'transform 0.3s ease-out'; // Re-enable transition
+
+            if (pullDelta > PULL_THRESHOLD && (Date.now() - lastRefreshTime > REFRESH_TIMEOUT)) {
+                container.style.transform = `translateY(${PULL_THRESHOLD}px)`; // Snap to refresh position
+                showLoading(loadingOverlay);
+                refreshCallback().finally(() => {
+                    container.style.transform = 'translateY(0)';
+                    container.classList.remove('pull-to-refresh-ready');
+                    hideLoading(loadingOverlay);
+                    lastRefreshTime = Date.now();
+                });
+            } else {
+                container.style.transform = 'translateY(0)'; // Snap back
+                container.classList.remove('pull-to-refresh-ready');
+            }
+            isPulling = false;
+        }
+    }
+
+    const setupPullToRefresh = (containerSelector, listSelector, refreshCallback, loadingOverlaySelector) => {
+        const container = document.querySelector(containerSelector);
+        const list = document.querySelector(listSelector);
+        const loadingOverlay = document.getElementById(loadingOverlaySelector);
+
+        if (!container || !list || !loadingOverlay) return;
+
+        let lastTouchY = 0;
+        let initialScrollTop = 0;
+
+        container.addEventListener('touchstart', (e) => {
+            if (container.scrollTop === 0) {
+                initialScrollTop = container.scrollTop;
+                lastTouchY = e.touches[0].clientY;
+                isPulling = false; // Reset isPulling for each touch start
+            }
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            if (container.scrollTop === 0 && e.touches[0].clientY > lastTouchY && !isPulling) {
+                 isPulling = true; // Start pulling only if scrolled to top and pulling down
+                 startY = e.touches[0].clientY;
+                 container.style.transition = 'none';
+            }
+
+            if (isPulling && container.scrollTop <= 0) { // Only pull if at or above scroll top 0
+                const currentY = e.touches[0].clientY;
+                const pullDelta = currentY - startY;
+
+                if (pullDelta > 0) {
+                    e.preventDefault(); // Prevent native scroll
+                    container.style.transform = `translateY(${Math.min(pullDelta, PULL_THRESHOLD * 1.5)}px)`;
+                    if (pullDelta > PULL_THRESHOLD && !container.classList.contains('pull-to-refresh-ready')) {
+                        container.classList.add('pull-to-refresh-ready');
+                        // showSnackbar('Lepas untuk menyegarkan!', 'info'); // Snackbar can be annoying on pull
+                    } else if (pullDelta <= PULL_THRESHOLD && container.classList.contains('pull-to-refresh-ready')) {
+                        container.classList.remove('pull-to-refresh-ready');
+                    }
+                } else {
+                    // If moving up (pullDelta <= 0) while pulling, reset pull state
+                    isPulling = false;
+                    container.style.transform = 'translateY(0)';
+                    container.style.transition = 'transform 0.3s ease-out';
+                    container.classList.remove('pull-to-refresh-ready');
+                }
+            } else if (isPulling && container.scrollTop > 0) { // If user started pulling, then scrolled down
+                 isPulling = false; // Stop pull-to-refresh
+                 container.style.transform = 'translateY(0)';
+                 container.style.transition = 'transform 0.3s ease-out';
+                 container.classList.remove('pull-to-refresh-ready');
+            }
+        }, { passive: false }); // Use passive: false to allow e.preventDefault()
+
+        container.addEventListener('touchend', (e) => {
+            if (isPulling) {
+                const pullDelta = e.changedTouches[0].clientY - startY;
+                container.style.transition = 'transform 0.3s ease-out';
+
+                if (pullDelta > PULL_THRESHOLD && (Date.now() - lastRefreshTime > REFRESH_TIMEOUT)) {
+                    container.style.transform = `translateY(${PULL_THRESHOLD}px)`;
+                    showLoading(loadingOverlay);
+                    refreshCallback().finally(() => {
+                        container.style.transform = 'translateY(0)';
+                        container.classList.remove('pull-to-refresh-ready');
+                        hideLoading(loadingOverlay);
+                        lastRefreshTime = Date.now();
+                    });
+                } else {
+                    container.style.transform = 'translateY(0)';
+                    container.classList.remove('pull-to-refresh-ready');
+                }
+                isPulling = false;
+            }
+        });
+
+        // Also add mouse events for desktop testing
+        let isMouseDown = false;
+        let mouseStartY = 0;
+        
+        container.addEventListener('mousedown', (e) => {
+            if (container.scrollTop === 0 && e.button === 0) { // Left click
+                isMouseDown = true;
+                mouseStartY = e.clientY;
+                container.style.transition = 'none';
+            }
+        });
+
+        container.addEventListener('mousemove', (e) => {
+            if (isMouseDown && container.scrollTop === 0) {
+                const pullDelta = e.clientY - mouseStartY;
+                if (pullDelta > 0) {
+                    e.preventDefault();
+                    container.style.transform = `translateY(${Math.min(pullDelta, PULL_THRESHOLD * 1.5)}px)`;
+                    if (pullDelta > PULL_THRESHOLD && !container.classList.contains('pull-to-refresh-ready')) {
+                        container.classList.add('pull-to-refresh-ready');
+                    } else if (pullDelta <= PULL_THRESHOLD && container.classList.contains('pull-to-refresh-ready')) {
+                        container.classList.remove('pull-to-refresh-ready');
+                    }
+                } else {
+                     // If moving up (pullDelta <= 0) while pulling, reset pull state
+                    isMouseDown = false;
+                    container.style.transform = 'translateY(0)';
+                    container.style.transition = 'transform 0.3s ease-out';
+                    container.classList.remove('pull-to-refresh-ready');
+                }
+            } else if (isMouseDown && container.scrollTop > 0) {
+                isMouseDown = false;
+                container.style.transform = 'translateY(0)';
+                container.style.transition = 'transform 0.3s ease-out';
+                container.classList.remove('pull-to-refresh-ready');
+            }
+        });
+
+        container.addEventListener('mouseup', (e) => {
+            if (isMouseDown) {
+                const pullDelta = e.clientY - mouseStartY;
+                container.style.transition = 'transform 0.3s ease-out';
+                if (pullDelta > PULL_THRESHOLD && (Date.now() - lastRefreshTime > REFRESH_TIMEOUT)) {
+                    container.style.transform = `translateY(${PULL_THRESHOLD}px)`;
+                    showLoading(loadingOverlay);
+                    refreshCallback().finally(() => {
+                        container.style.transform = 'translateY(0)';
+                        container.classList.remove('pull-to-refresh-ready');
+                        hideLoading(loadingOverlay);
+                        lastRefreshTime = Date.now();
+                    });
+                } else {
+                    container.style.transform = 'translateY(0)';
+                    container.classList.remove('pull-to-refresh-ready');
+                }
+                isMouseDown = false;
+            }
+        });
+        container.addEventListener('mouseleave', () => { // If mouse leaves while dragging
+            if (isMouseDown) {
+                isMouseDown = false;
+                container.style.transform = 'translateY(0)';
+                container.style.transition = 'transform 0.3s ease-out';
+                container.classList.remove('pull-to-refresh-ready');
+            }
+        });
+    };
+
+    setupPullToRefresh('#jadwal-view', '#jadwal-list', async () => {
+        const selectedDay = days[currentDayIndex];
+        await displayJadwal(selectedDay, jadwalSearchInput.value.trim());
+    }, 'jadwal-loading-overlay');
+
+    setupPullToRefresh('#teacher-view', '.subject-grid-container', async () => {
+        await renderSubjectBoxes(currentTeacherPage);
+    }, 'teacher-loading-overlay');
+
+    setupPullToRefresh('#student-view', '.student-table-container', async () => {
+        await renderStudentTable(currentStudentPage, studentSearchInput.value.trim());
+    }, 'student-loading-overlay');
+
+    setupPullToRefresh('#task-view', '.task-table-container', async () => {
+        await renderTaskTable(currentTaskPage);
+    }, 'task-loading-overlay');
+
+
+    ebookBox.addEventListener('click', () => {
+        window.open('https://drive.google.com/drive/u/0/folders/1I9tEvAKkkc-r1YCESmpsfX7_p3dys7id', '_blank');
+        showSnackbar('Mengarahkan ke Google Drive E-Book.', 'info');
+    });
+
+    jadwalBox.addEventListener('click', showJadwalView);
+    studentBox.addEventListener('click', showStudentView);
+    teacherBox.addEventListener('click', showTeacherView);
+    taskBox.addEventListener('click', showTaskView);
+    settingsButtonFooter.addEventListener('click', showSettingsView);
+    profileSettingsItem.addEventListener('click', showProfileView);
+    profileLoginButton.addEventListener('click', showLoginView);
+    loginBackButton.addEventListener('click', showProfileView);
+
+    globalHomeButtonFooter.addEventListener('click', () => {
+        showMainView(true);
+    });
+
+    goToHomepageButton.addEventListener('click', () => {
+        showMainView();
+    });
+
+    goToCreditButton.addEventListener('click', () => {
+        showCreditView();
+    });
+
+    creditBackButton.addEventListener('click', () => {
+        showView(coverView);
+    });
+
+    dayDisplayBubble.addEventListener('click', (event) => {
+        if (event.target === dayDisplayBubble || event.target.closest('.day-display-bubble') === dayDisplayBubble) {
+            toggleDayDropdown();
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!dayDisplayBubble.contains(event.target) && !customDayDropdown.contains(event.target)) {
+            toggleDayDropdown(false);
+        }
+        if (!searchFilterButton.contains(event.target) && !searchFilterDropdownContent.contains(event.target)) {
+            searchFilterDropdownContent.classList.remove('show');
+            searchFilterButton.classList.remove('active');
+        }
+    });
+
+    prevDayArrow.addEventListener('click', () => {
+        currentDayIndex = (currentDayIndex - 1 + days.length) % days.length;
+        currentDayDisplay.textContent = days[currentDayIndex];
+        displayJadwal(days[currentDayIndex], jadwalSearchInput.value.trim());
+        updateSelectedDayClass();
+    });
+
+    nextDayArrow.addEventListener('click', () => {
+        currentDayIndex = (currentDayIndex + 1) % days.length;
+        currentDayDisplay.textContent = days[currentDayIndex];
+        displayJadwal(days[currentDayIndex], jadwalSearchInput.value.trim());
+        updateSelectedDayClass();
+    });
+
+    jadwalSearchInput.addEventListener('input', debounce(function() {
+        displayJadwal(days[currentDayIndex], jadwalSearchInput.value.trim());
+    }, 300));
+
+
+    prevSubjectPageArrow.addEventListener('click', () => {
+        if (currentTeacherPage > 0) {
+            currentTeacherPage--;
+            renderSubjectBoxes(currentTeacherPage);
+        }
+    });
+
+    nextSubjectPageArrow.addEventListener('click', () => {
+        totalPages = Math.ceil(subjectNames.length / itemsPerPage);
+        if (currentTeacherPage < totalPages - 1) {
+            currentTeacherPage++;
+            renderSubjectBoxes(currentTeacherPage);
+        }
+    });
+
+
+    prevStudentPageArrow.addEventListener('click', () => {
+        if (currentStudentPage > 0) {
+            currentStudentPage--;
+            renderStudentTable(currentStudentPage, studentSearchInput.value.trim());
+        }
+    });
+
+    nextStudentPageArrow.addEventListener('click', () => {
+        const currentFilteredStudents = studentData.filter(student =>
+            student.nama.toLowerCase().includes(studentSearchInput.value.toLowerCase().trim()) ||
+            String(student.nis).includes(studentSearchInput.value.toLowerCase().trim()) ||
+            String(student.nisn).includes(studentSearchInput.value.toLowerCase().trim())
+        );
+        totalStudentPages = Math.ceil(currentFilteredStudents.length / studentsPerPage);
+
+        if (currentStudentPage < totalStudentPages - 1) {
+            currentStudentPage++;
+            renderStudentTable(currentStudentPage, studentSearchInput.value.trim());
+        }
+    });
+
+    studentSearchInput.addEventListener('input', debounce(function() {
+        currentStudentPage = 0;
+        renderStudentTable(currentStudentPage, studentSearchInput.value.trim());
+    }, 300));
+
+
+    prevTaskPageArrow.addEventListener('click', () => {
+        if (currentTaskPage > 0) {
+            currentTaskPage--;
+            renderTaskTable(currentTaskPage);
+        }
+    });
+
+    nextTaskPageArrow.addEventListener('click', () => {
+        if (currentTaskPage < totalTaskPages - 1) {
+            currentTaskPage++;
+            renderTaskTable(currentTaskPage);
+        }
+    });
+
+    addTaskButton.addEventListener('click', () => showManageTaskView(null));
+    manageTaskBackButton.addEventListener('click', showTaskView);
+
+    closeTeacherModalButton.addEventListener('click', hideTeacherModal);
+    teacherDetailModalOverlay.addEventListener('click', (event) => {
+        if (event.target === teacherDetailModalOverlay) {
+            hideTeacherModal();
+        }
+    });
+
+    closeTaskDetailModal.addEventListener('click', hideTaskDetailModal);
+    taskDetailModalOverlay.addEventListener('click', (event) => {
+        if (event.target === taskDetailModalOverlay) {
+            hideTaskDetailModal();
+        }
+    });
+
+    globalSearchInput.addEventListener('input', handleGlobalSearchDebounced);
+    closeSearchModalButton.addEventListener('click', hideSearchResultsModal);
+    searchResultsModalOverlay.addEventListener('click', (event) => {
+        if (event.target === searchResultsModalOverlay) {
+            hideSearchResultsModal();
+        }
+    });
+
+    searchFilterButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        searchFilterDropdownContent.classList.toggle('show');
+        searchFilterButton.classList.toggle('active');
+    });
+
+    document.querySelectorAll('.search-filter-item').forEach(item => {
+        item.addEventListener('click', (event) => {
+            currentSearchFilter = event.target.dataset.filter;
+            currentSearchFilterDisplay.textContent = event.target.textContent;
+            searchFilterDropdownContent.classList.remove('show');
+            searchFilterButton.classList.remove('active');
+            globalSearchInput.placeholder = `Cari ${event.target.textContent}...`;
+            globalSearchInput.value = '';
+            hideSearchResultsModal();
+        });
+    });
+
+    document.querySelectorAll('.grid-item, .settings-item-full, .cover-button, .day-nav-arrow, .pagination-arrow, .login-button, .publish-button, .add-task-button, .action-button, .confirm-button, .login-specific-top-bar .back-button, .credit-specific-top-bar .back-button, .delete-task-from-detail-button, .theme-button, .subject-box').forEach(item => {
+        item.addEventListener('mousedown', (e) => {
+            e.currentTarget.classList.add('active');
+        });
+        item.addEventListener('mouseup', (e) => {
+            e.currentTarget.classList.remove('active');
+        });
+        item.addEventListener('mouseleave', (e) => {
+            e.currentTarget.classList.remove('active');
+        });
+        if (item.tagName === 'INPUT' || item.tagName === 'TEXTAREA' || item.tagName === 'SELECT') {
+            item.addEventListener('focus', (e) => {
+                e.currentTarget.classList.add('focused');
+            });
+            item.addEventListener('blur', (e) => {
+                e.currentTarget.classList.remove('focused');
+            });
+        }
+    });
+
     loadUserProfile();
     populateSubjectDatalist();
-    renderEbookList(); // Pastikan daftar e-book di-render saat aplikasi dimulai
     showView(coverView);
 });

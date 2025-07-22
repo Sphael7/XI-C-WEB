@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="dark-mode">
-
+<body class="theme-1">
     <div id="cover-view" class="active-view">
         <header class="cover-top-bar">
             <span id="cover-date-display" class="cover-date"></span>
@@ -38,10 +37,19 @@
         <header class="top-bar" id="global-top-bar">
             <div class="search-section">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" placeholder="Search..." class="search-input">
+                <input type="text" placeholder="Search..." class="search-input" id="global-search-input">
+            </div>
+            <div class="search-filter-dropdown-container">
+                <button class="search-filter-button" id="search-filter-button">
+                    <span id="current-search-filter">Guru</span> <i class="fas fa-caret-down"></i>
+                </button>
+                <div class="search-filter-dropdown-content" id="search-filter-dropdown-content">
+                    <div class="search-filter-item" data-filter="teacher">Guru</div>
+                    <div class="search-filter-item" data-filter="student">Murid</div>
+                </div>
             </div>
             <div class="mode-toggle" id="mode-toggle">
-                <i class="fas fa-moon mode-icon"></i>
+                <i class="fas fa-palette mode-icon"></i>
             </div>
         </header>
 
@@ -59,9 +67,8 @@
                     <h3>Guru</h3>
                     <p>Profil dan jadwal mengajar para guru.</p>
                 </div>
-                <div class="grid-item item-4" id="others-box">
-                    <h3>Lainnya</h3>
-                    <p>Menu dan fitur tambahan yang relevan.</p>
+                <div class="grid-item item-4" id="ebook-box"> <h3>E-Book</h3>
+                    <p>Akses kumpulan E-Book mata pelajaran di Google Drive.</p>
                 </div>
                 <div class="grid-item item-5" id="task-main-box">
                     <h3>Tugas</h3>
@@ -88,7 +95,11 @@
             </div>
 
             <div id="jadwal-list" class="jadwal-list">
+                <div class="loading-overlay hidden" id="jadwal-loading-overlay">
+                    <div class="spinner"></div>
+                    <p>Memuat jadwal...</p>
                 </div>
+            </div>
         </div>
 
         <div id="settings-view" class="hidden-view">
@@ -98,10 +109,18 @@
                     <div class="settings-item-full" id="profile-settings-item">
                         <h3>Profile</h3>
                     </div>
-                    <div class="settings-item-full">
-                        <h3>More</h3>
-                    </div>
                 </div>
+                <section class="theme-selection-section">
+                    <h3 class="theme-section-title">Pilih Tema</h3>
+                    <div class="theme-buttons-container">
+                        <button class="theme-button" data-theme="theme-1">Noble Theme</button>
+                        <button class="theme-button" data-theme="theme-2">Light Theme</button>
+                        <button class="theme-button" data-theme="theme-3">Forest Theme</button>
+                        <button class="theme-button" data-theme="theme-4">German Theme</button>
+                        <button class="theme-button" data-theme="theme-5">Beach Theme</button>
+                        <button class="theme-button" data-theme="theme-6">Sunset Theme</button>
+                    </div>
+                </section>
                 <div class="about-us-text-section">
                     <h3 class="about-us-title">About Us:</h3>
                     <p class="app-credit">This app was made by Chris XI-C</p>
@@ -133,7 +152,7 @@
                     <div class="detail-row">
                         <span class="detail-label">NISN:</span>
                         <span class="detail-value" id="profile-nisn">Belum diisi</span>
-                    -</div>
+                    </div>
                     <div class="detail-row">
                         <span class="detail-label">NIS:</span>
                         <span class="detail-value" id="profile-nis">Belum diisi</span>
@@ -191,22 +210,6 @@
 
         <div id="other-view" class="hidden-view">
             <main class="other-content">
-                <div class="other-item" id="ebook-box">
-                    <h3>E-Book</h3>
-                    <p>Berisi kumpulan E-Book mata pelajaran.</p>
-                </div>
-                <div class="other-item" id="komitmen-box">
-                    <h3>Komitmen</h3>
-                    <p>Daftar komitmen.</p>
-                </div>
-
-                <div id="ebook-list-container" class="ebook-list-container">
-                    </div>
-
-                <button class="add-ebook-button" id="add-ebook-button">
-                    <i class="fas fa-upload"></i> Unggah E-book
-                </button>
-
                 <div class="time-display-section">
                     <span id="real-time-wib">00:00</span>
                 </div>
@@ -216,7 +219,11 @@
         <div id="teacher-view" class="hidden-view">
             <main class="teacher-content">
                 <div class="subject-grid-container">
+                    <div class="loading-overlay hidden" id="teacher-loading-overlay">
+                        <div class="spinner"></div>
+                        <p>Memuat data guru...</p>
                     </div>
+                </div>
                 <div class="pagination-controls">
                     <i class="fas fa-chevron-left pagination-arrow" id="prev-subject-page"></i>
                     <span class="page-number-display">
@@ -247,6 +254,10 @@
                         <tbody id="student-table-body">
                             </tbody>
                     </table>
+                    <div class="loading-overlay hidden" id="student-loading-overlay">
+                        <div class="spinner"></div>
+                        <p>Memuat data murid...</p>
+                    </div>
                 </div>
                 <div class="pagination-controls student-pagination-controls">
                     <i class="fas fa-chevron-left pagination-arrow" id="prev-student-page"></i>
@@ -275,6 +286,10 @@
                         <tbody id="task-table-body">
                             </tbody>
                     </table>
+                    <div class="loading-overlay hidden" id="task-loading-overlay">
+                        <div class="spinner"></div>
+                        <p>Memuat tugas...</p>
+                    </div>
                 </div>
                 <div class="pagination-controls task-pagination-controls">
                     <i class="fas fa-chevron-left pagination-arrow" id="prev-task-page"></i>
@@ -342,7 +357,7 @@
                     <p><strong>Deadline:</strong> <span id="task-detail-deadline"></span></p>
                     <div class="task-detail-content" id="task-detail-content"></div>
                     <div class="task-detail-actions">
-                        <button class="delete-task-from-detail-button" id="delete-task-from-detail-button" title="Hapus Tugas">
+                        <button class="delete-task-from-detail-button" data-id="" id="delete-task-from-detail-button" title="Hapus Tugas">
                             <i class="fas fa-trash-alt"></i> Hapus Tugas
                         </button>
                     </div>
@@ -353,24 +368,11 @@
         <div class="search-results-modal-overlay hidden" id="search-results-modal-overlay">
             <div class="search-results-modal-content">
                 <div class="search-results-modal-header">
-                    <h3>Hasil Pencarian Guru</h3>
-                    <i class="fas fa-times close-search-modal-button" id="close-search-modal"></i>
+                    <h3 id="search-results-modal-title">Hasil Pencarian</h3> <i class="fas fa-times close-search-modal-button" id="close-search-modal"></i>
                 </div>
                 <div class="search-results-modal-body">
-                    <div class="search-results-table-container">
-                        <table class="teacher-modal-table">
-                            <thead>
-                                <tr>
-                                    <th>Kode</th>
-                                    <th>Nama</th>
-                                    <th>Mapel</th>
-                                </tr>
-                            </thead>
-                            <tbody id="search-results-teacher-table-body">
-                            </tbody>
-                        </table>
-                    </div>
-                    <p id="no-search-results-message" class="no-results-message hidden">Tidak ada guru ditemukan.</p>
+                    <div id="search-results-table-container"></div>
+                    <p id="no-search-results-message" class="no-results-message hidden">Tidak ada hasil ditemukan.</p>
                 </div>
             </div>
         </div>
@@ -427,16 +429,8 @@
                 <h3><i class="fas fa-brain"></i> Tim Pengembang</h3>
                 <p><strong>Lead Developer:</strong> <span class="developer-name">Christopher Alberto Hamonangan – XI-C</span><br>
                 Bertanggung jawab atas keseluruhan proses pengembangan teknis website, termasuk struktur proyek, pengelolaan versi kode melalui GitHub, kolaborasi tim, serta proses deployment menggunakan Vercel.</p>
-                <p><strong>UI Designer:</strong> <span class="developer-name">Faiz Syawaludin Wibowo – XI-C</span><br>
-                Merancang antarmuka pengguna dengan fokus pada estetika visual, pemilihan warna, tipografi, dan tata letak halaman untuk memastikan tampilan yang konsisten dan menarik.</p>
-                <p><strong>UX Designer:</strong> <span class="developer-name">Belum ditunjuk</span><br>
-                Posisi ini akan bertugas mengoptimalkan alur interaksi pengguna, memastikan kemudahan navigasi, dan menciptakan pengalaman pengguna yang efisien dan intuitif.</p>
-                <p><strong>Front-End Developer:</strong> <span class="developer-name">Christopher Alberto Hamonangan – XI-C</span><br>
-                Menerapkan desain antarmuka ke dalam bentuk kode menggunakan teknologi HTML, CSS, dan JavaScript, serta memastikan tampilan website responsif dan fungsional pada berbagai perangkat.</p>
-                <p><strong>Content Writer:</strong> <span class="developer-name">Belum ditunjuk</span><br>
-                Posisi ini bertanggung jawab untuk menyusun dan mengelola konten tertulis pada website, seperti deskripsi halaman, profil kelas, dan informasi penting lainnya.</p>
-                <p><strong>Tester:</strong> <span class="developer-name">Fide Cristo Hasiholan Tambunan – XI-C</span><br>
-                Melakukan pengujian terhadap seluruh fitur dan halaman website guna memastikan tidak terdapat kesalahan teknis (bug), serta memberikan masukan yang membangun untuk meningkatkan kualitas tampilan dan pengalaman pengguna.</p>
+                <p><strong>Staff:</strong> <span class="developer-name">Faiz Syawaludin Wibowo – XI-C</span>, <span class="developer-name">Fide Cristo Hasiholan Tambunan – XI-C</span><br>
+                <span class="staff-description">Berperan penting dalam mendukung berbagai aspek pengembangan aplikasi, mulai dari pengujian fitur, validasi data, hingga kontribusi pada penyusunan konten. Dedikasi mereka memastikan kualitas dan keandalan sistem secara keseluruhan.</span></p>
             </section>
 
             <section class="credit-section license">
@@ -470,21 +464,6 @@
     </div>
     
     <div id="snackbar" class="snackbar"></div>
-    <div id="delete-confirm-modal-overlay" class="modal-overlay hidden">
-        <div class="modal-content small-modal">
-            <div class="modal-header">
-                <h3>Konfirmasi Hapus</h3>
-                <i class="fas fa-times close-modal-button" id="close-delete-confirm-modal"></i>
-            </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus tugas ini?</p> <div class="confirm-buttons">
-                    <button class="confirm-button cancel-button" id="cancel-delete">Batal</button>
-                    <button class="confirm-button delete-button" id="confirm-delete">Hapus</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>
